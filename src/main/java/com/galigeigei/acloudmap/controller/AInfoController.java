@@ -28,5 +28,7 @@ public class AInfoController {
     public ApiResult getAllInfo(){
         return aInfoService.getAllInfo();
     }
+
+
 }
 

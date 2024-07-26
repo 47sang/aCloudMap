@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -15,6 +16,7 @@ import java.io.Serializable;
  * @author 周士钰
  * @since 2024-07-26
  */
+@Accessors(chain = true)
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AInfo implements Serializable {

@@ -31,7 +31,7 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         Map<String,Object> params = new HashMap<>();
         params.put("pn","1");
-        params.put("pz","50000");
+        params.put("pz","7000");
         params.put("po","1");
         params.put("np","1");
         params.put("ut","bd1d9ddb04089700cf9c27f6f7426281");
@@ -44,8 +44,11 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         String resultStr = HttpUtil.get(API_URL, params);
 
+
         JSONArray jsonArray = JSONObject.parseObject(resultStr).getJSONObject("data").getJSONArray("diff");
 
         return ApiResult.success().data(jsonArray);
     }
+
+
 }
