@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.galigeigei.acloudmap.mapper.ATodayMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.galigeigei.acloudmap.entity.AToday">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="total" property="total" />
+        <result column="price" property="price" />
+        <result column="increase" property="increase" />
+        <result column="discretion" property="discretion" />
+        <result column="arr_value" property="arrValue" />
+        <result column="turnover" property="turnover" />
+        <result column="into_date" property="intoDate" />
+        <result column="today" property="today" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, code, total, price, increase, discretion, arr_value, turnover, into_date, today
+    </sql>
+
+</mapper>

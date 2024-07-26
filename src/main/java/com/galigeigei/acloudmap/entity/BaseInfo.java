@@ -107,7 +107,7 @@ public class BaseInfo {
      * 流通市值(元)
      */
     @JSONField(name = "f21")
-    private long f21;
+    private double f21;
     @JSONField(name = "f22")
     private double f22;
     /**
@@ -123,7 +123,7 @@ public class BaseInfo {
      * 上市日期:20240726
      */
     @JSONField(name = "f26")
-    private int f26;
+    private String f26;
     @JSONField(name = "f27")
     private int f27;
     @JSONField(name = "f28")
