@@ -32,47 +32,62 @@
       ROOT_PATH + './data.json',
       function (obama_budget_2012) {
         myChart.hideLoading();
-        const visualMin = -100;
-        const visualMax = 100;
-        const visualMinBound = -40;
-        const visualMaxBound = 40;
+
         convertData(obama_budget_2012);
-        function convertData(originList) {
-          let min = Infinity;
-          let max = -Infinity;
-          for (let i = 0; i < originList.length; i++) {
-            let node = originList[i];
-            if (node) {
-              let value = node.value;
-              value[2] != null && value[2] < min && (min = value[2]);
-              value[2] != null && value[2] > max && (max = value[2]);
-            }
+
+        function getColorData(value) {
+          // 如果 x 不在任何一个区间内
+          rgb = "#424453";
+
+          if ( value < -4) {
+            rgb = "#00ff4d";
           }
+          if (value >= -4 && value < -3) {
+            rgb = "#00d641";
+          }
+          if (value >= -3 && value < -2) {
+            rgb = "#1aa448";
+          }
+          if (value >= -2 && value < -1) {
+            rgb = "#0e6f2f";
+          }
+          if (value >= -1 && value < 0) {
+            rgb = "#0e4922";
+          }
+          if (value === 0) {
+            // 中间值
+            rgb = "#424453";
+          }
+          if (value > 0 && value <= 1) {
+            rgb = "#491414";
+          }
+          if (value > 1 && value <= 2) {
+            rgb = "#961010";
+          }
+          if (value > 2 && value <= 3) {
+            rgb = "#be0808";
+          }
+          if (value > 3 && value <= 4) {
+            rgb = "#f11010";
+          }
+          if (value > 4) {
+            rgb = "#ff0000";
+          }
+          return rgb;
+        }
+
+        function convertData(originList) {
+
           for (let i = 0; i < originList.length; i++) {
             let node = originList[i];
             if (node) {
-              let value = node.value;
-              // Scale value for visual effect
-              if (value[2] != null && value[2] > 0) {
-                value[3] = echarts.number.linearMap(
-                  value[2],
-                  [0, max],
-                  [visualMaxBound, visualMax],
-                  true
-                );
-              } else if (value[2] != null && value[2] < 0) {
-                value[3] = echarts.number.linearMap(
-                  value[2],
-                  [min, 0],
-                  [visualMin, visualMinBound],
-                  true
-                );
-              } else {
-                value[3] = 0;
+              let value = node.increase;
+              if (node.increase || value == 0) {
+                node.itemStyle = {
+                  color: getColorData(value)
+                }
               }
-              if (!isFinite(value[3])) {
-                value[3] = 0;
-              }
+
               if (node.children) {
                 convertData(node.children);
               }
@@ -92,23 +107,24 @@
             tooltip: {
               formatter: function (info) {
                 let value = info.value;
-                let amount = value[0];
+                let data = info.data;
+                let amount = data.total;
                 amount = isValidNumber(amount)
                   ? '￥' + echarts.format.addCommas(amount)
                   : '-';
-                let amount2011 = value[1];
-                amount2011 = isValidNumber(amount2011)
-                  ? '￥' + echarts.format.addCommas(amount2011)
+                let price = data.price;
+                price = isValidNumber(price)
+                  ? '￥' + echarts.format.addCommas(price)
                   : '-';
-                let change = value[2];
+                let change = data.increase;
                 change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
                 return [
                   '<div class="tooltip-title">' +
-                  echarts.format.encodeHTML(info.name) +
+                  echarts.format.encodeHTML(data.name) +
                   '</div>',
                   '当前市值: &nbsp;&nbsp;' + amount + '<br>',
                   // 'Per Household: &nbsp;&nbsp;' + perHousehold + '<br>',
-                  '当前价格: &nbsp;&nbsp;' + amount2011 + '<br>',
+                  '当前价格: &nbsp;&nbsp;' + price + '<br>',
                   '涨跌幅: &nbsp;&nbsp;' + change
                 ].join('');
               }
@@ -125,9 +141,6 @@
                 itemStyle: {
                   borderColor: 'black'
                 },
-                visualMin: visualMin,
-                visualMax: visualMax,
-                visualDimension: 3,
                 levels: [
                   {
                     itemStyle: {
@@ -137,7 +150,6 @@
                     }
                   },
                   {
-                    // color: ['#269f3c', '#aaa', '#942e38'],
                     color: ["#00d641",
                       "#1aa448",
                       "#0e6f2f",
