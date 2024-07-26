@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.galigeigei.acloudmap.mapper.AInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.galigeigei.acloudmap.entity.AInfo">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="bk_id" property="bkId" />
+        <result column="bk_name" property="bkName" />
+        <result column="ej_id" property="ejId" />
+        <result column="ej_name" property="ejName" />
+        <result column="exchange" property="exchange" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, name, bk_id, bk_name, ej_id, ej_name, exchange
+    </sql>
+
+</mapper>
