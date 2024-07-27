@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.galigeigei.acloudmap.entity.*;
 import com.galigeigei.acloudmap.mapper.AInfoMapper;
 import com.galigeigei.acloudmap.service.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -25,7 +26,8 @@ import java.util.stream.Collectors;
 @Service
 public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements AInfoService {
 
-    static final String API_URL = "https://82.push2.eastmoney.com/api/qt/clist/get";
+    @Value("${parameters.allInfo}")
+    private String API_URL;
     @Resource
     private ATodayService aTodayService;
 
