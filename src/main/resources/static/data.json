@@ -7,8 +7,7 @@
     ],
     "total": 1226629000,
     "name": "白酒板块",
-    "id": "branch-8",
-    "discretion": null,
+    "code": "branch-8",
     "children": [
       {
         "value": [
@@ -20,8 +19,7 @@
         "price": 160,
         "increase": 0.1,
         "name": "贵州茅台",
-        "id": "leaf-135",
-        "discretion": "你有说明吗"
+        "code": "leaf-135"
       },
       {
         "value": [
@@ -33,8 +31,7 @@
         "price": 163,
         "increase": 3,
         "name": "五粮液",
-        "id": "leaf-131",
-        "discretion": "不行喽"
+        "code": "leaf-131"
       },
       {
         "value": [
@@ -46,8 +43,7 @@
         "price": 163,
         "increase": 2,
         "name": "天齐锂业",
-        "id": "leaf-127",
-        "discretion": "discretionary"
+        "code": "leaf-127"
       },
       {
         "value": [
@@ -59,8 +55,7 @@
         "price": 163,
         "increase": -2.5,
         "name": "通威股份",
-        "id": "leaf-1123",
-        "discretion": "discretionary"
+        "code": "leaf-1123"
       },
       {
         "value": [
@@ -72,8 +67,7 @@
         "price": 163,
         "increase": 0,
         "name": "南大光电",
-        "id": "leaf-1181",
-        "discretion": "discretionary"
+        "code": "leaf-1181"
       },
       {
         "value": [
@@ -85,8 +79,7 @@
         "price": 163,
         "increase": -1,
         "name": "碧桂园",
-        "id": "leaf-1184",
-        "discretion": "discretionary"
+        "code": "leaf-1184"
       }
     ]
   },
@@ -98,8 +91,7 @@
     ],
     "total": 818284000,
     "name": "银行板块",
-    "id": "branch-34",
-    "discretion": null,
+    "code": "branch-34",
     "children": [
       {
         "value": [
@@ -111,8 +103,7 @@
         "price": 163,
         "increase": -20,
         "name": "广大银行",
-        "id": "leaf-531",
-        "discretion": "mandatory"
+        "code": "leaf-531"
       },
       {
         "value": [
@@ -124,8 +115,7 @@
         "price": 163,
         "increase": -1,
         "name": "民生银行",
-        "id": "leaf-530",
-        "discretion": "discretionary"
+        "code": "leaf-530"
       }
     ]
   }

@@ -10,7 +10,7 @@
         <result column="total" property="total" />
         <result column="price" property="price" />
         <result column="increase" property="increase" />
-        <result column="discretion" property="discretion" />
+        <result column="creat_time" property="creatTime" />
         <result column="arr_value" property="arrValue" />
         <result column="turnover" property="turnover" />
         <result column="into_date" property="intoDate" />
@@ -19,7 +19,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, code, total, price, increase, discretion, arr_value, turnover, into_date, today
+        id, name, code, total, price, increase, arr_value, turnover, into_date, today, creat_time
     </sql>
 
 </mapper>

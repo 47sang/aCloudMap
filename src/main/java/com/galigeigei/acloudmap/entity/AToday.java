@@ -1,12 +1,16 @@
 package com.galigeigei.acloudmap.entity;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * <p>
@@ -52,14 +56,14 @@ public class AToday implements Serializable {
     private Double increase;
 
     /**
-     * 描述
+     * 数据数组str
      */
-    private String discretion;
-
+    private String arrValue;
     /**
      * 数据数组
      */
-    private String arrValue;
+    @TableField(exist = false)
+    private JSONArray value;
 
     /**
      * 换手率
@@ -75,6 +79,10 @@ public class AToday implements Serializable {
      * 数据日期
      */
     private String today;
+     /**
+     * 创建时间
+     */
+    private Date creatTime;
 
 
 }
