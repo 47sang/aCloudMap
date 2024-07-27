@@ -5,22 +5,22 @@
 <html lang="zh_CN" style="height: 100%">
 
 <head>
-  <title>A股大盘云图</title>
-  <meta charset="utf-8">
+    <title>A股大盘云图</title>
+    <meta charset="utf-8">
 </head>
 
 <body style="height: 100%; margin: 0">
-  <div id="container" style="height: 100%"></div>
+<div id="container" style="height: 100%"></div>
 
-  <script type="text/javascript" src="https://registry.npmmirror.com/jquery/3.7.1/files/dist/jquery.min.js"></script>
-  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/echarts.min.js"></script>
+<script type="text/javascript" src="https://registry.npmmirror.com/jquery/3.7.1/files/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/echarts.min.js"></script>
 
 
-  <script type="text/javascript">
+<script type="text/javascript">
     var dom = document.getElementById('container');
     var myChart = echarts.init(dom, null, {
-      renderer: 'canvas',
-      useDirtyRect: false
+        renderer: 'canvas',
+        useDirtyRect: false
     });
     var app = {};
     var API_PATH = './info/all';
@@ -29,159 +29,159 @@
 
     myChart.showLoading();
     const household_america_2012 = 113616229;
-    $.get(
-      API_PATH,
-      function (jsonData) {
-        myChart.hideLoading();
+    $.get(API_PATH, function (jsonData) {
+            myChart.hideLoading();
 
-        convertData(jsonData.data);
+            convertData(jsonData.data);
 
-        function getColorData(value) {
-          // 如果 x 不在任何一个区间内
-          color = "#424453";
+            function getColorData(value) {
+                // 如果 x 不在任何一个区间内
+                color = "#424453";
 
-          if (value < -4) {
-            color = "#00ff4d";
-          }
-          if (value >= -4 && value < -3) {
-            color = "#00d641";
-          }
-          if (value >= -3 && value < -2) {
-            color = "#1aa448";
-          }
-          if (value >= -2 && value < -1) {
-            color = "#0e6f2f";
-          }
-          if (value >= -1 && value < 0) {
-            color = "#0e4922";
-          }
-          if (value === 0) {
-            // 中间值
-            color = "#424453";
-          }
-          if (value > 0 && value <= 1) {
-            color = "#491414";
-          }
-          if (value > 1 && value <= 2) {
-            color = "#961010";
-          }
-          if (value > 2 && value <= 3) {
-            color = "#be0808";
-          }
-          if (value > 3 && value <= 4) {
-            color = "#f11010";
-          }
-          if (value > 4) {
-            color = "#ff0000";
-          }
-          return color;
-        }
-
-        function convertData(originList) {
-
-          for (let i = 0; i < originList.length; i++) {
-            let node = originList[i];
-            if (node) {
-              let value = node.increase;
-              if (node.increase || value == 0) {
-                node.itemStyle = {
-                  color: getColorData(value)
+                if (value < -4) {
+                    color = "#00ff4d";
                 }
-              }
-
-              if (node.children) {
-                convertData(node.children);
-              }
+                if (value >= -4 && value < -3) {
+                    color = "#00d641";
+                }
+                if (value >= -3 && value < -2) {
+                    color = "#1aa448";
+                }
+                if (value >= -2 && value < -1) {
+                    color = "#0e6f2f";
+                }
+                if (value >= -1 && value < 0) {
+                    color = "#0e4922";
+                }
+                if (value === 0) {
+                    // 中间值
+                    color = "#424453";
+                }
+                if (value > 0 && value <= 1) {
+                    color = "#491414";
+                }
+                if (value > 1 && value <= 2) {
+                    color = "#961010";
+                }
+                if (value > 2 && value <= 3) {
+                    color = "#be0808";
+                }
+                if (value > 3 && value <= 4) {
+                    color = "#f11010";
+                }
+                if (value > 4) {
+                    color = "#ff0000";
+                }
+                return color;
             }
-          }
-        }
-        function isValidNumber(num) {
-          return num != null && isFinite(num);
-        }
-        myChart.setOption(
-          (option = {
-            title: {
-              top: 15,
-              left: 'center',
-              text: 'A股大盘云图',
-            },
-            tooltip: {
-              formatter: function (info) {
-                let value = info.value;
-                let data = info.data;
-                let amount = data.total;
-                amount = isValidNumber(amount)
-                  ? '￥' + echarts.format.addCommas(amount)
-                  : '-';
-                let price = data.price;
-                price = isValidNumber(price)
-                  ? '￥' + echarts.format.addCommas(price)
-                  : '-';
-                let change = data.increase;
-                change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
-                return [
-                  '<div class="tooltip-title">' +
-                  echarts.format.encodeHTML(data.name + "(" + data.code + ")") +
-                  '</div>',
-                  '当前市值: &nbsp;&nbsp;' + amount + '<br>',
-                  // 'Per Household: &nbsp;&nbsp;' + perHousehold + '<br>',
-                  '当前价格: &nbsp;&nbsp;' + price + '<br>',
-                  '涨跌幅: &nbsp;&nbsp;' + change
-                ].join('');
-              }
-            },
-            series: [
-              {
-                name: 'A股',
-                top: 80,
-                type: 'treemap',
-                label: {
-                  show: true,
-                  formatter: function (params) {
-                    return params.data.name + '\n' + params.data.increase+'%'; // 显示名称和值
-                  }
-                },
-                itemStyle: {
-                  borderColor: 'black'
-                },
-                levels: [
-                  {
-                    itemStyle: {
-                      borderWidth: 2,
-                      borderColor: '#000000',
-                      gapWidth: 3
+
+            function convertData(originList) {
+
+                for (let i = 0; i < originList.length; i++) {
+                    let node = originList[i];
+                    if (node) {
+                        let value = node.increase;
+                        if (node.increase || value == 0) {
+                            node.itemStyle = {
+                                color: getColorData(value)
+                            }
+                        }
+
+                        if (node.children) {
+                            convertData(node.children);
+                        }
                     }
-                  },
-                  {
-                    color: ["#00d641",
-                      "#1aa448",
-                      "#0e6f2f",
-                      "#085421",
-                      "#424453",
-                      "#6d1414",
-                      "#961010",
-                      "#be0808",
-                      "#e41414"],
-                    colorMappingBy: 'value',
-                    itemStyle: {
-                      gapWidth: 1
-                    }
-                  }
-                ],
-                data: jsonData.data
-              }
-            ]
-          })
-        );
-      }
+                }
+            }
+
+            function isValidNumber(num) {
+                return num != null && isFinite(num);
+            }
+
+            myChart.setOption(
+                (option = {
+                    title: {
+                        top: 15,
+                        left: 'center',
+                        text: 'A股大盘云图',
+                    },
+                    tooltip: {
+                        formatter: function (info) {
+                            let value = info.value;
+                            let data = info.data;
+                            let amount = data.total;
+                            amount = isValidNumber(amount)
+                                ? '￥' + echarts.format.addCommas(amount)
+                                : '-';
+                            let price = data.price;
+                            price = isValidNumber(price)
+                                ? '￥' + echarts.format.addCommas(price)
+                                : '-';
+                            let change = data.increase;
+                            change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
+                            return [
+                                '<div class="tooltip-title">' +
+                                echarts.format.encodeHTML(data.name + "(" + data.code + ")") +
+                                '</div>',
+                                '当前市值: &nbsp;&nbsp;' + amount + '<br>',
+                                // 'Per Household: &nbsp;&nbsp;' + perHousehold + '<br>',
+                                '当前价格: &nbsp;&nbsp;' + price + '<br>',
+                                '涨跌幅: &nbsp;&nbsp;' + change
+                            ].join('');
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'A股',
+                            top: 80,
+                            type: 'treemap',
+                            label: {
+                                show: true,
+                                formatter: function (params) {
+                                    return params.data.name + '\n' + params.data.increase + '%'; // 显示名称和值
+                                }
+                            },
+                            itemStyle: {
+                                borderColor: 'black'
+                            },
+                            levels: [
+                                {
+                                    itemStyle: {
+                                        borderWidth: 2,
+                                        borderColor: '#000000',
+                                        gapWidth: 3
+                                    }
+                                },
+                                {
+                                    color: ["#00d641",
+                                        "#1aa448",
+                                        "#0e6f2f",
+                                        "#085421",
+                                        "#424453",
+                                        "#6d1414",
+                                        "#961010",
+                                        "#be0808",
+                                        "#e41414"],
+                                    colorMappingBy: 'value',
+                                    itemStyle: {
+                                        gapWidth: 1
+                                    }
+                                }
+                            ],
+                            data: jsonData.data
+                        }
+                    ]
+                })
+            );
+        }
     );
 
     if (option && typeof option === 'object') {
-      myChart.setOption(option);
+        myChart.setOption(option);
     }
 
     window.addEventListener('resize', myChart.resize);
-  </script>
+</script>
 </body>
 
 </html>

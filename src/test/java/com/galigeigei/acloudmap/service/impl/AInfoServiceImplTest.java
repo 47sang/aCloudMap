@@ -11,6 +11,7 @@ import com.galigeigei.acloudmap.service.ASwService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -26,7 +27,8 @@ import java.util.*;
 @SpringBootTest
 public class AInfoServiceImplTest {
 
-    static final String API_URL = "https://82.push2.eastmoney.com/api/qt/clist/get";
+    @Value("${parameters.allInfo}")
+    private String API_URL;
 
     @Resource
     private ASwService aSwService;
