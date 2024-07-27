@@ -8,6 +8,7 @@ import com.galigeigei.acloudmap.entity.ASw;
 import com.galigeigei.acloudmap.entity.BaseInfo;
 import com.galigeigei.acloudmap.service.AInfoService;
 import com.galigeigei.acloudmap.service.ASwService;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,8 +34,12 @@ public class AInfoServiceImplTest {
     @Resource
     private AInfoService aInfoService;
 
+    /**
+     * 从接口获取的股票信息,和申万字典中的数据进行匹配,
+     * 然后保存到info表中,供大图分类时使用
+     */
     @Test
-    public void getAllInfo() {
+    public void addAllInfo() {
         Map<String, Object> params = new HashMap<>();
         params.put("pn", "1");
         params.put("pz", "7000");
@@ -52,7 +57,7 @@ public class AInfoServiceImplTest {
 
         JSONArray jsonArray = JSONObject.parseObject(resultStr).getJSONObject("data").getJSONArray("diff");
 
-        List<AInfo> aInfoList = new ArrayList<>();
+        List<AInfo> aInfoList = aInfoService.list();
 
         List<ASw> list = aSwService.list();
 
@@ -66,7 +71,7 @@ public class AInfoServiceImplTest {
                     .filter(aSw -> aSw.getIndustryType().contains("二")).findFirst();
 
 
-            AInfo aInfo = new AInfo();
+            AInfo aInfo = aInfoList.stream().filter(aInfo1 -> aInfo1.getCode().equals(json.getF12())).findFirst().orElseGet(AInfo::new);
             aInfo.setCode(json.getF12())
                     .setName(json.getF14())
                     .setExchange(exchange(json.getF12()))
@@ -80,11 +85,11 @@ public class AInfoServiceImplTest {
 
         aInfoList.sort(Comparator.comparing(AInfo::getCode));
 
-        boolean b = aInfoService.saveBatch(aInfoList);
+        boolean b = aInfoService.saveOrUpdateBatch(aInfoList);
 
-        System.out.println(b ? "批量保存成功" : "失败");
+        System.out.println(b ? "批量新增成功" : "失败");
 
-        // System.out.println(aInfoList);
+        Assert.assertTrue(b);
 
     }
 

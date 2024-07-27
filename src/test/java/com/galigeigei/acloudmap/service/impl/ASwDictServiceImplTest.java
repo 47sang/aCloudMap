@@ -4,6 +4,7 @@ import com.galigeigei.acloudmap.entity.ASw;
 import com.galigeigei.acloudmap.entity.ASwDict;
 import com.galigeigei.acloudmap.service.ASwDictService;
 import com.galigeigei.acloudmap.service.ASwService;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,7 +58,9 @@ public class ASwDictServiceImplTest {
             dictList.add(dict);
         });
 
-        aSwDictService.saveBatch(dictList);
+        boolean b = aSwDictService.saveBatch(dictList);
+
+        Assert.assertTrue(b);
 
     }
 
