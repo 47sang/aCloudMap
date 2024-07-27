@@ -7,10 +7,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.galigeigei.acloudmap.entity.*;
 import com.galigeigei.acloudmap.mapper.AInfoMapper;
-import com.galigeigei.acloudmap.service.AInfoService;
-import com.galigeigei.acloudmap.service.ASwDictService;
-import com.galigeigei.acloudmap.service.ASwService;
-import com.galigeigei.acloudmap.service.ATodayService;
+import com.galigeigei.acloudmap.service.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,9 +33,19 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
     private ASwDictService aSwDictService;
     @Resource
     private ASwService aSwService;
+    @Resource
+    private ADataJsonService aDataJsonService;
 
     @Override
     public ApiResult getAllInfo() {
+
+        ADataJson todayData = aDataJsonService.getTodayData();
+
+        if (todayData != null) {
+
+            JSONObject jsonObject = JSONObject.parseObject(todayData.getJson());
+            return ApiResult.success().data(jsonObject);
+        }
 
         Map<String, Object> params = new HashMap<>();
         params.put("pn", "1");
@@ -60,7 +67,11 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         List<AToday> aTodayList = updateTodayInfo(jsonArray);
 
-        return ApiResult.success().data(setDataToMap(aTodayList));
+        JSONArray dataJson = setDataToMap(aTodayList);
+
+        aDataJsonService.saveDataJson(dataJson);
+
+        return ApiResult.success().data(dataJson);
     }
 
     /**

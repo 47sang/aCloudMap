@@ -1,6 +1,7 @@
 package com.galigeigei.acloudmap.entity;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -79,9 +79,10 @@ public class AToday implements Serializable {
      * 数据日期
      */
     private String today;
-     /**
+    /**
      * 创建时间
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date creatTime;
 
 
