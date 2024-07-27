@@ -23,57 +23,57 @@
       useDirtyRect: false
     });
     var app = {};
-    var ROOT_PATH = '';
+    var API_PATH = './info/all';
     var option;
 
     myChart.showLoading();
     const household_america_2012 = 113616229;
     $.get(
-      ROOT_PATH + './data.json',
-      function (obama_budget_2012) {
+      API_PATH,
+      function (jsonData) {
         myChart.hideLoading();
 
-        convertData(obama_budget_2012);
+        convertData(jsonData.data);
 
         function getColorData(value) {
           // 如果 x 不在任何一个区间内
-          rgb = "#424453";
+          color = "#424453";
 
           if ( value < -4) {
-            rgb = "#00ff4d";
+            color = "#00ff4d";
           }
           if (value >= -4 && value < -3) {
-            rgb = "#00d641";
+            color = "#00d641";
           }
           if (value >= -3 && value < -2) {
-            rgb = "#1aa448";
+            color = "#1aa448";
           }
           if (value >= -2 && value < -1) {
-            rgb = "#0e6f2f";
+            color = "#0e6f2f";
           }
           if (value >= -1 && value < 0) {
-            rgb = "#0e4922";
+            color = "#0e4922";
           }
           if (value === 0) {
             // 中间值
-            rgb = "#424453";
+            color = "#424453";
           }
           if (value > 0 && value <= 1) {
-            rgb = "#491414";
+            color = "#491414";
           }
           if (value > 1 && value <= 2) {
-            rgb = "#961010";
+            color = "#961010";
           }
           if (value > 2 && value <= 3) {
-            rgb = "#be0808";
+            color = "#be0808";
           }
           if (value > 3 && value <= 4) {
-            rgb = "#f11010";
+            color = "#f11010";
           }
           if (value > 4) {
-            rgb = "#ff0000";
+            color = "#ff0000";
           }
-          return rgb;
+          return color;
         }
 
         function convertData(originList) {
@@ -165,7 +165,7 @@
                     }
                   }
                 ],
-                data: obama_budget_2012
+                data: jsonData.data
               }
             ]
           })
