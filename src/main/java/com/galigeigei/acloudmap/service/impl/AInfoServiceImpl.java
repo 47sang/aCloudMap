@@ -43,7 +43,7 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         if (todayData != null) {
 
-            JSONObject jsonObject = JSONObject.parseObject(todayData.getJson());
+            JSONArray jsonObject = JSONArray.parseArray(todayData.getJson());
             return ApiResult.success().data(jsonObject);
         }
 
@@ -148,6 +148,7 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
                             .collect(Collectors.toList())
                             .contains(item1.getCode()))
                     .peek(item2 -> item2.setValue(JSONArray.parseArray(item2.getArrValue())))
+                    .sorted(Comparator.comparingLong(o -> ((AToday) o).getTotal()).reversed())
                     .collect(Collectors.toList());
 
             // 将股票一级分类需要的总市值的信息进行计算
@@ -163,8 +164,12 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
             jsonArray.add(jsonObject);
         });
+        //根据板块总市值进行从大到小排序
+        List<Object> collect = jsonArray.stream()
+                .sorted(Comparator.comparingLong(o -> ((JSONObject) o).getLong("total")).reversed())
+                .collect(Collectors.toList());
 
-        return jsonArray;
+        return JSONArray.parseArray(JSONObject.toJSONString(collect));
     }
 
 
