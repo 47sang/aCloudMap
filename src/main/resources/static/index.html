@@ -24,6 +24,7 @@
     });
     var app = {};
     var API_PATH = './info/all';
+    // var API_PATH = './data.json';
     var option;
 
     myChart.showLoading();
@@ -39,7 +40,7 @@
           // 如果 x 不在任何一个区间内
           color = "#424453";
 
-          if ( value < -4) {
+          if (value < -4) {
             color = "#00ff4d";
           }
           if (value >= -4 && value < -3) {
@@ -120,7 +121,7 @@
                 change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
                 return [
                   '<div class="tooltip-title">' +
-                  echarts.format.encodeHTML(data.name) +
+                  echarts.format.encodeHTML(data.name + "(" + data.code + ")") +
                   '</div>',
                   '当前市值: &nbsp;&nbsp;' + amount + '<br>',
                   // 'Per Household: &nbsp;&nbsp;' + perHousehold + '<br>',
@@ -136,7 +137,9 @@
                 type: 'treemap',
                 label: {
                   show: true,
-                  formatter: '{b}'
+                  formatter: function (params) {
+                    return params.data.name + '\n' + params.data.increase+'%'; // 显示名称和值
+                  }
                 },
                 itemStyle: {
                   borderColor: 'black'
@@ -144,9 +147,9 @@
                 levels: [
                   {
                     itemStyle: {
-                      borderWidth: 3,
-                      borderColor: '#333',
-                      gapWidth: 4
+                      borderWidth: 2,
+                      borderColor: '#000000',
+                      gapWidth: 3
                     }
                   },
                   {
@@ -161,7 +164,7 @@
                       "#e41414"],
                     colorMappingBy: 'value',
                     itemStyle: {
-                      gapWidth: 2
+                      gapWidth: 1
                     }
                   }
                 ],
