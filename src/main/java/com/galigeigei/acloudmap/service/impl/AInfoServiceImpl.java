@@ -129,14 +129,16 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         // 获取一级分类所有code
         List<ASwDict> codeList = aSwDictService.lambdaQuery().like(ASwDict::getType, "一").list();
+        // List<ASwDict> code2List = aSwDictService.lambdaQuery().like(ASwDict::getType, "二").list();
 
         // 获取一级分类所有股票
         List<ASw> alist = aSwService.lambdaQuery().like(ASw::getIndustryType, "一").list();
+        // List<ASw> alist2 = aSwService.lambdaQuery().like(ASw::getIndustryType, "二").list();
 
         // 根据code获取所有分类下的股票
         codeList.forEach(item -> {
-            // 组装该分类的数据
 
+            // 组装该分类的数据
             JSONObject jsonObject = new JSONObject();
 
             // 将一级分类的股票过滤出来
@@ -153,6 +155,47 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
                     .sorted(Comparator.comparingLong(o -> ((AToday) o).getTotal()).reversed())
                     .collect(Collectors.toList());
 
+            // TODO:将一级分类下的股票进行二级分类组合
+            // 当前一级分类下的所有股票信息
+            List<AInfo> ejList = this.lambdaQuery().eq(AInfo::getBkId, item.getCode()).list();
+
+            // 整理出二级分类的代码和股票代码,去重的数据
+            Map<String, AInfo> distinctMap = ejList.stream()
+                    .collect(Collectors.toMap(
+                            AInfo::getEjId,
+                            aInfo -> aInfo,
+                            (existing, replacement) -> existing
+                    ));
+
+            List<AInfo> distinctEjList = distinctMap.values().stream().collect(Collectors.toList());
+
+            JSONArray ejArray = new JSONArray();
+            // 根据代码进行查询股票市值信息组装成子节点
+            distinctEjList.forEach(ej -> {
+                // 组装该分类的数据
+                JSONObject ejJson = new JSONObject();
+
+                // 根据二级分类将股票数据过滤出来
+                List<String> ejCode = ejList.stream().filter(ejItem -> ejItem.getEjId().equals(ej.getEjId())).map(AInfo::getCode).collect(Collectors.toList());
+
+                List<AToday> ejTodayList = itemList.stream().filter(aToday -> ejCode.contains(aToday.getCode())).collect(Collectors.toList());
+
+                // 将股票二级分类需要的总市值的信息进行计算
+                Long ejtotal = ejTodayList.stream().mapToLong(AToday::getTotal).sum();
+
+                Long[] value2 = {ejtotal, null, null};
+
+                ejJson.put("name", ej.getEjName());
+                ejJson.put("code", ej.getEjId());
+                ejJson.put("total", ejtotal);
+                ejJson.put("value", value2);
+                ejJson.put("children", ejTodayList);
+
+                ejArray.add(ejJson);
+
+            });
+
+
             // 将股票一级分类需要的总市值的信息进行计算
             Long total = itemList.stream().mapToLong(AToday::getTotal).sum();
 
@@ -162,11 +205,11 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
             jsonObject.put("code", item.getCode());
             jsonObject.put("total", total);
             jsonObject.put("value", value);
-            jsonObject.put("children", itemList);
+            jsonObject.put("children", ejArray);
 
             jsonArray.add(jsonObject);
         });
-        //根据板块总市值进行从大到小排序
+        // 根据板块总市值进行从大到小排序
         List<Object> collect = jsonArray.stream()
                 .sorted(Comparator.comparingLong(o -> ((JSONObject) o).getLong("total")).reversed())
                 .collect(Collectors.toList());
