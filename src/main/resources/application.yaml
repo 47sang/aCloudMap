@@ -6,6 +6,7 @@ spring:
     name: aCloudMap
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/galigeigei?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8&connectTimeout=1000&socketTimeout=30000&autoReconnectForPools=true
     url: jdbc:mysql://192.168.5.13:3306/galigeigei?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8&connectTimeout=1000&socketTimeout=30000&autoReconnectForPools=true
     username: galigeigei
     password: cp5BaBdhGCjLLfit

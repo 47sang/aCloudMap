@@ -65,8 +65,9 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         String resultStr = HttpUtil.get(API_URL, params);
 
+        String replace = resultStr.replace("-", "0");
 
-        JSONArray jsonArray = JSONObject.parseObject(resultStr).getJSONObject("data").getJSONArray("diff");
+        JSONArray jsonArray = JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
 
         List<AToday> aTodayList = updateTodayInfo(jsonArray);
 
