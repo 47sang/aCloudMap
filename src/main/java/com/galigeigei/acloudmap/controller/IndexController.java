@@ -14,4 +14,9 @@ public class IndexController {
     public String html() {
         return "index.html";
     }
+
+    @RequestMapping("/sort")
+    public String sort() {
+        return "sort.html";
+    }
 }

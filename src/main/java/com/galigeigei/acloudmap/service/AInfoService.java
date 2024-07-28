@@ -15,9 +15,16 @@ import com.galigeigei.acloudmap.entity.ApiResult;
 public interface AInfoService extends IService<AInfo> {
 
     /**
-     * 获取所有股票信息
+     * 获取一二级分类整理后的所有股票信息
      *
      * @return {@link ApiResult }
      */
     ApiResult getAllInfo();
+
+    /**
+     * 按照市值排序的股票信息
+     *
+     * @return {@link ApiResult }
+     */
+    ApiResult getSortInfo();
 }

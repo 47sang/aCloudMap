@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -69,12 +70,14 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         List<AToday> aTodayList = updateTodayInfo(jsonArray);
 
-        JSONArray dataJson = setDataToMap(aTodayList);
+        List<Object> dataJson = setDataToMap(aTodayList);
 
         aDataJsonService.saveDataJson(dataJson);
 
         return ApiResult.success().data(dataJson);
     }
+
+
 
     /**
      * 更新今天A股数据
@@ -124,7 +127,7 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
      * @param aTodayList 今日股票信息
      * @return {@link JSONArray }
      */
-    public JSONArray setDataToMap(List<AToday> aTodayList) {
+    public List<Object> setDataToMap(List<AToday> aTodayList) {
         JSONArray jsonArray = new JSONArray();
 
         // 获取一级分类所有code
@@ -195,6 +198,9 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
             });
 
+            List<Object> ejArraySort = ejArray.stream()
+                    .sorted(Comparator.comparingLong(o -> ((JSONObject) o).getLong("total")).reversed())
+                    .collect(Collectors.toList());
 
             // 将股票一级分类需要的总市值的信息进行计算
             Long total = itemList.stream().mapToLong(AToday::getTotal).sum();
@@ -205,17 +211,71 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
             jsonObject.put("code", item.getCode());
             jsonObject.put("total", total);
             jsonObject.put("value", value);
-            jsonObject.put("children", ejArray);
+            jsonObject.put("children", ejArraySort);
 
             jsonArray.add(jsonObject);
         });
         // 根据板块总市值进行从大到小排序
-        List<Object> collect = jsonArray.stream()
+
+        return jsonArray.stream()
                 .sorted(Comparator.comparingLong(o -> ((JSONObject) o).getLong("total")).reversed())
                 .collect(Collectors.toList());
-
-        return JSONArray.parseArray(JSONObject.toJSONString(collect));
     }
 
+
+    @Override
+    public ApiResult getSortInfo() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("pn", "1");
+        params.put("pz", "7000");
+        params.put("po", "1");
+        params.put("np", "1");
+        params.put("ut", "bd1d9ddb04089700cf9c27f6f7426281");
+        params.put("fltt", "2");
+        params.put("invt", "2");
+        params.put("fid", "f20");
+        params.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
+        params.put("fields", "f2,f3,f8,f12,f14,f20,f26");
+        params.put("_", "1623833739532");
+
+        String resultStr = HttpUtil.get(API_URL, params);
+
+
+        JSONArray jsonArray = JSONObject.parseObject(resultStr).getJSONObject("data").getJSONArray("diff");
+        List<AToday> aTodayList = new ArrayList<>();
+
+
+        ArrayList<Object> objects = new ArrayList<>(jsonArray);
+
+        for (int i = 0; i < objects.size(); i++) {
+
+
+            BaseInfo baseInfo = JSONObject.parseObject(JSONObject.toJSONString(objects.get(i)), BaseInfo.class);
+
+            AToday aToday = new AToday();
+
+
+            aToday.setId(i+1);
+            aToday.setCode(baseInfo.getF12());
+            aToday.setName(baseInfo.getF14());
+            aToday.setTotal(baseInfo.getF20());
+            aToday.setPrice(baseInfo.getF2());
+            aToday.setIncrease(baseInfo.getF3());
+            aToday.setTurnover(baseInfo.getF8());
+            aToday.setIntoDate(baseInfo.getF26());
+            aToday.setToday(DateUtil.today());
+            aToday.setCreatTime(new Date());
+
+            JSONArray arr = new JSONArray();
+            arr.add(aToday.getTotal());
+            arr.add(aToday.getPrice());
+            arr.add(aToday.getIncrease());
+
+            aToday.setArrValue(arr.toJSONString());
+            aToday.setValue(arr);
+            aTodayList.add(aToday);
+        }
+        return ApiResult.success().data(aTodayList);
+    }
 
 }

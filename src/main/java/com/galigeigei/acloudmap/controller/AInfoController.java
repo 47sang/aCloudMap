@@ -29,6 +29,11 @@ public class AInfoController {
         return aInfoService.getAllInfo();
     }
 
+    @GetMapping("/sort")
+    public ApiResult getSortInfo(){
+        return aInfoService.getSortInfo();
+    }
+
 
 }
 

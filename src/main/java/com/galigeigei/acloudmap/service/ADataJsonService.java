@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.galigeigei.acloudmap.entity.ADataJson;
 
+import java.util.List;
+
 /**
  * <p>
  * 每日数据 服务类
@@ -25,7 +27,6 @@ public interface ADataJsonService extends IService<ADataJson> {
      * 保存每日数据json
      *
      * @param aDataJson 数据json
-     * @return boolean
      */
-    boolean saveDataJson(JSONArray aDataJson);
+    void saveDataJson(List<Object> aDataJson);
 }

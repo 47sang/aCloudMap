@@ -5,7 +5,7 @@
 <html lang="zh_CN" style="height: 100%">
 
 <head>
-    <title>A股大盘云图</title>
+    <title>A股大盘云图-按市值排序</title>
     <meta charset="utf-8">
 </head>
 
@@ -23,8 +23,8 @@
         useDirtyRect: false
     });
     var app = {};
-    var API_PATH = './info/all';
-    // var API_PATH = './data.json';
+    var API_PATH = './info/sort';
+    // var API_PATH = './sort.json';
     var option;
 
     myChart.showLoading();
@@ -145,7 +145,7 @@
                             label: {
                                 show: true,
                                 formatter: function (params) {
-                                    return params.data.name + '\n' + params.data.increase + '%'; // 显示名称和值
+                                    return params.data.id +'.'+params.data.name + '\n' + params.data.increase + '%'; // 显示名称和值
                                 }
                             },
                             itemStyle: {
@@ -154,9 +154,9 @@
                             levels: [
                                 {
                                     itemStyle: {
-                                        borderWidth: 2,
+                                        borderWidth: 1,
                                         borderColor: '#000000',
-                                        gapWidth: 3
+                                        gapWidth: 1
                                     }
                                 },
                                 {
