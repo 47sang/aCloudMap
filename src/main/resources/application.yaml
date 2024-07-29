@@ -1,5 +1,7 @@
 server:
   port: 1808
+  servlet:
+    context-path: /aCloudMap
 
 spring:
   application:
