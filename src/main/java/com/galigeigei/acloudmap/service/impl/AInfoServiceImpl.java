@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +69,7 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         String resultStr = HttpUtil.get(API_URL, params);
 
-        String replace = resultStr.replace("-", "0");
+        String replace = resultStr.replace("\"-\"", "0");
 
         JSONArray jsonArray = JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
 
@@ -82,7 +81,6 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         return ApiResult.success().data(dataJson);
     }
-
 
 
     /**
@@ -246,8 +244,9 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         String resultStr = HttpUtil.get(API_URL, params);
 
+        String replace = resultStr.replace("\"-\"", "0");
 
-        JSONArray jsonArray = JSONObject.parseObject(resultStr).getJSONObject("data").getJSONArray("diff");
+        JSONArray jsonArray = JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
         List<AToday> aTodayList = new ArrayList<>();
 
 
@@ -261,7 +260,7 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
             AToday aToday = new AToday();
 
 
-            aToday.setId(i+1);
+            aToday.setId(i + 1);
             aToday.setCode(baseInfo.getF12());
             aToday.setName(baseInfo.getF14());
             aToday.setTotal(baseInfo.getF20());
