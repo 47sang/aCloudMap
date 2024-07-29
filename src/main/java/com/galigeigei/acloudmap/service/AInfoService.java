@@ -22,6 +22,13 @@ public interface AInfoService extends IService<AInfo> {
     ApiResult getAllInfo();
 
     /**
+     * 获取今日股票信息
+     *
+     * @return {@link ApiResult }
+     */
+    ApiResult getTodayInfo();
+
+    /**
      * 按照市值排序的股票信息
      *
      * @return {@link ApiResult }

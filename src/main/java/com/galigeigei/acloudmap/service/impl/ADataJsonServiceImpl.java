@@ -32,12 +32,12 @@ public class ADataJsonServiceImpl extends ServiceImpl<ADataJsonMapper, ADataJson
     @Override
     public void saveDataJson(List<Object> aDataJson) {
 
-        ADataJson data = new ADataJson();
+        ADataJson data = this.lambdaQuery().eq(ADataJson::getToday, DateUtil.today()).list().stream().findFirst().orElseGet(ADataJson::new);
 
         data.setJson(JSONObject.toJSONString(aDataJson));
         data.setToday(DateUtil.today());
         data.setCreatTime(new Date());
 
-        this.save(data);
+        this.saveOrUpdate(data);
     }
 }

@@ -50,6 +50,11 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
             return ApiResult.success().data(jsonObject);
         }
 
+        return getTodayInfo();
+    }
+
+    @Override
+    public ApiResult getTodayInfo() {
         Map<String, Object> params = new HashMap<>();
         params.put("pn", "1");
         params.put("pz", "7000");
