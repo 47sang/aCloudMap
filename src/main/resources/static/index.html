@@ -20,7 +20,8 @@
     var dom = document.getElementById('container');
     var myChart = echarts.init(dom, null, {
         renderer: 'canvas',
-        useDirtyRect: false
+        // renderer: 'svg',
+        useDirtyRect: true
     });
     var app = {};
     var API_PATH = './info/all';

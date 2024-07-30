@@ -23,27 +23,39 @@ public class TaskService {
     // 上午开盘期间
     @Scheduled(cron = "0 16-59/1 9 * * 1-5")
     public void refreshTheStockInfo1() {
+        timeLog();
+    }
+
+    @Scheduled(cron = "0 */1 10-11 * * 1-5")
+    public void refreshTheStockInfo2() {
+        timeLog();
+    }
+
+    @Scheduled(cron = "0 0-30/1 11 * * 1-5")
+    public void refreshTheStockInfo3() {
+        timeLog();
+    }
+
+    // 下午开盘期间
+    @Scheduled(cron = "0 0-59/1 13-14 * * 1-5")
+    public void refreshTheStockInfo4() {
+        timeLog();
+    }
+
+    @Scheduled(cron = "8 0 15 * * 1-5")
+    public void refreshTheStockInfo5() {
+        timeLog();
+    }
+
+    /**
+     * 记录本次定时任务执行耗时
+     */
+    public void timeLog(){
         long startTime = System.currentTimeMillis();
 
         aInfoService.getTodayInfo();
 
         long time = System.currentTimeMillis() - startTime;
-        log.info("本次定时任务执行耗时:{}秒", time/1000);
-    }
-
-    @Scheduled(cron = "0 */1 10-11 * * 1-5")
-    public void refreshTheStockInfo2() {
-        aInfoService.getTodayInfo();
-    }
-
-    @Scheduled(cron = "0 0-30/1 11 * * 1-5")
-    public void refreshTheStockInfo3() {
-        aInfoService.getTodayInfo();
-    }
-
-    // 下午开盘期间
-    @Scheduled(cron = "0 0-59/1 13-15 * * 1-5")
-    public void refreshTheStockInfo4() {
-        aInfoService.getTodayInfo();
+        log.info("定时任务,刷新最新数据耗时:{}秒", time/1000);
     }
 }
