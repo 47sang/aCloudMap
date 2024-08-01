@@ -1,5 +1,6 @@
 package com.galigeigei.acloudmap.task;
 
+import cn.hutool.core.date.DateUtil;
 import com.galigeigei.acloudmap.service.AInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,41 +22,26 @@ public class TaskService {
     private AInfoService aInfoService;
 
     // 上午开盘期间
-    @Scheduled(cron = "0 16-59/1 9 * * 1-5")
+    @Scheduled(cron = "2 0-59/1 9-15 * * 1-5")
     public void refreshTheStockInfo1() {
-        timeLog();
-    }
-
-    @Scheduled(cron = "0 */1 10-11 * * 1-5")
-    public void refreshTheStockInfo2() {
-        timeLog();
-    }
-
-    @Scheduled(cron = "0 0-30/1 11 * * 1-5")
-    public void refreshTheStockInfo3() {
-        timeLog();
-    }
-
-    // 下午开盘期间
-    @Scheduled(cron = "0 0-59/1 13-14 * * 1-5")
-    public void refreshTheStockInfo4() {
-        timeLog();
-    }
-
-    @Scheduled(cron = "8 0 15 * * 1-5")
-    public void refreshTheStockInfo5() {
         timeLog();
     }
 
     /**
      * 记录本次定时任务执行耗时
      */
-    public void timeLog(){
-        long startTime = System.currentTimeMillis();
+    public void timeLog() {
 
-        aInfoService.getTodayInfo();
+        // 判断当前时间是否在开盘期间
+        if (DateUtil.isIn(DateUtil.date(), DateUtil.parse("09:15:00"), DateUtil.parse("11:30:05"))
+                || DateUtil.isIn(DateUtil.date(), DateUtil.parse("13:00:00"), DateUtil.parse("15:00:05"))) {
 
-        long time = System.currentTimeMillis() - startTime;
-        log.info("定时任务,刷新最新数据耗时:{}秒", time/1000);
+            long startTime = System.currentTimeMillis();
+
+            aInfoService.getTodayInfo();
+
+            long time = System.currentTimeMillis() - startTime;
+            log.info("定时任务,刷新最新数据耗时:{}秒", time / 1000);
+        }
     }
 }
