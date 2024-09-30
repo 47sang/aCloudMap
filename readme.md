@@ -1,14 +1,13 @@
 # A股大盘云图
 
-[大盘板块分类云图](https://47sang.github.io/) 
+## 2024年9月30日 万紫千红的大A
 
-[市值大小排序云图](https://47sang.github.io/sort) 
-
-[![数据可视化](./img/1.png)](./img/1.png)
-[![数据可视化](./img/2.png)](./img/2.png)
-[![数据可视化](./img/3.png)](./img/3.png)
+[![数据可视化](./img/1.jpg)](./img/1.jpg)
 
 [大盘板块分类云图](https://47sang.github.io/) 
+
+
+[![数据可视化](./img/2.jpg)](./img/2.jpg)
 
 [市值大小排序云图](https://47sang.github.io/sort) 
 
