@@ -19,4 +19,9 @@ public class IndexController {
     public String sort() {
         return "sort.html";
     }
+
+    @RequestMapping("/section")
+    public String section() {
+        return "section.html";
+    }
 }

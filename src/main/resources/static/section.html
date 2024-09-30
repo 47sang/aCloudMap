@@ -1,0 +1,201 @@
+<!--
+	此示例下载自 https://echarts.apache.org/examples/zh/editor.html?c=treemap-visual
+-->
+<!DOCTYPE html>
+<html lang="zh_CN" style="height: 100%">
+
+<head>
+    <title>A股大盘云图</title>
+    <meta charset="utf-8">
+</head>
+
+<body style="height: 100%; margin: 0">
+<div id="container" style="height: 100%"></div>
+
+<script type="text/javascript" src="https://registry.npmmirror.com/jquery/3.7.1/files/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/echarts.min.js"></script>
+
+
+<script type="text/javascript">
+    var dom = document.getElementById('container');
+    var myChart = echarts.init(dom, null, {
+        renderer: 'canvas',
+        // renderer: 'svg',
+        useDirtyRect: true
+    });
+    var app = {};
+    var API_PATH = './info/section';
+    // var API_PATH = './data.json';
+    var option;
+
+    myChart.showLoading();
+    const household_america_2012 = 113616229;
+    $.get(API_PATH, function (jsonData) {
+            myChart.hideLoading();
+
+            convertData(jsonData.data);
+
+            function getColorData(value) {
+                // 如果 x 不在任何一个区间内
+                color = "#2f323d";
+
+                if (value < -9.97) {
+                    color = "#03bfff";
+                }
+                if (value >= -9.97 &&value < -4) {
+                    color = "#30cc5a";
+                }
+                if (value >= -4 && value < -3) {
+                    color = "#2fb152";
+                }
+                if (value >= -3 && value < -2) {
+                    color = "#2f9e4f";
+                }
+                if (value >= -2 && value < -1) {
+                    color = "#32844e";
+                }
+                if (value >= -1 && value < 0) {
+                    color = "#3d5451";
+                }
+                if (value === 0) {
+                    // 中间值
+                    color = "#2f323d";
+                }
+                if (value > 0 && value <= 1) {
+                    color = "#644553";
+                }
+                if (value > 1 && value <= 2) {
+                    color = "#8b444e";
+                }
+                if (value > 2 && value <= 3) {
+                    color = "#bf4045";
+                }
+                if (value > 3 && value <= 4) {
+                    color = "#df3a3d";
+                }
+                if (value > 4) {
+                    color = "#f63538";
+                }
+                //涨停以上为紫色,大红大紫
+                if (value >= 9.91) {
+                    color = "#a947ff";
+                }
+                return color;
+            }
+
+            function convertData(originList) {
+
+                for (let i = 0; i < originList.length; i++) {
+                    let node = originList[i];
+                    if (node) {
+                        let value = node.increase;
+                        if (node.increase || value == 0) {
+                            node.itemStyle = {
+                                color: getColorData(value)
+                            }
+                        }
+
+                        if (node.children) {
+                            convertData(node.children);
+                        }
+                    }
+                }
+            }
+
+            function isValidNumber(num) {
+                return num != null && isFinite(num);
+            }
+
+            myChart.setOption(
+                (option = {
+                    title: {
+                        top: 15,
+                        left: 'center',
+                        text: 'A股大盘云图',
+                    },
+                    tooltip: {
+                        formatter: function (info) {
+                            let data = info.data;
+                            //总市值
+                            let amount = data.total;
+                            amount = isValidNumber(amount)
+                                ? '￥' + (amount / 100000000).toFixed(2) + '亿'
+                                : '-';
+                            //涨跌额
+                            let price = data.turnover;
+                            price = isValidNumber(price)
+                                ? '￥' + (price / 100000000).toFixed(2) + '亿'
+                                : '-';
+                            //涨跌幅%
+                            let change = data.increase;
+                            change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
+                            return [
+                                '<div class="tooltip-title">' +
+                                echarts.format.encodeHTML(data.name + "(" + data.code + ")") +
+                                '</div>',
+                                '当前市值: &nbsp;&nbsp;' + amount + '<br>',
+                                '涨跌额: &nbsp;&nbsp;' + price + '<br>',
+                                '涨跌幅: &nbsp;&nbsp;' + change
+                            ].join('');
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'A股',
+                            top: 80,
+                            type: 'treemap',
+                            label: {
+                                show: true,
+                                formatter: function (params) {
+                                    let change = params.data.increase;
+                                    change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
+                                    return params.data.name + '\n' + change; // 显示名称和值
+                                }
+                            },
+                            animation: false, // 关闭动画
+                            // leafDepth: 2, // 设置叶子深度
+                            // roam: false, // 禁用漫游和缩放
+                            itemStyle: {
+                                borderColor: 'black'
+                            },
+                            levels: [
+                                {
+                                    itemStyle: {
+                                        borderWidth: 2,
+                                        borderColor: '#000000',
+                                        gapWidth: 3
+                                    }
+                                },
+                                {
+                                    color: ["#00d641",
+                                        "#1aa448",
+                                        "#0e6f2f",
+                                        "#085421",
+                                        "#424453",
+                                        "#6d1414",
+                                        "#961010",
+                                        "#be0808",
+                                        "#e41414"],
+                                    colorMappingBy: 'value',
+                                    itemStyle: {
+                                        gapWidth: 1
+                                    }
+                                }
+                            ],
+                            data: jsonData.data
+                        }
+                    ]
+                })
+            );
+        }
+    );
+
+    if (option && typeof option === 'object') {
+        myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+</script>
+</body>
+
+</html>

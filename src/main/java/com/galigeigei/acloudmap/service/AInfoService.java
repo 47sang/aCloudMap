@@ -34,4 +34,12 @@ public interface AInfoService extends IService<AInfo> {
      * @return {@link ApiResult }
      */
     ApiResult getSortInfo();
+
+
+    /**
+     * 获取板块涨跌信息
+     *
+     * @return {@link ApiResult }
+     */
+    ApiResult getSection();
 }

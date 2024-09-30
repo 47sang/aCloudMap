@@ -34,6 +34,11 @@ public class AInfoController {
         return aInfoService.getSortInfo();
     }
 
+    @GetMapping("/section")
+    public ApiResult getSection(){
+        return aInfoService.getSection();
+    }
+
 
 }
 

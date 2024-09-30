@@ -27,9 +27,14 @@ public class ADataJson implements Serializable {
     private Integer id;
 
     /**
-     * 数据
+     * 个股数据
      */
     private String json;
+
+    /**
+     * 板块数据
+     */
+    private String section;
 
     /**
      * 数据日期

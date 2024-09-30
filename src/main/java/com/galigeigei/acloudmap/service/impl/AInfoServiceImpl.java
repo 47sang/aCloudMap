@@ -44,7 +44,6 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
         ADataJson todayData = aDataJsonService.getTodayData();
 
         if (todayData != null) {
-
             JSONArray jsonObject = JSONArray.parseArray(todayData.getJson());
             return ApiResult.success().data(jsonObject);
         }
@@ -62,8 +61,10 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
         params.put("ut", "bd1d9ddb04089700cf9c27f6f7426281");
         params.put("fltt", "2");
         params.put("invt", "2");
+        // 排序条件
         params.put("fid", "f3");
         params.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
+        // 获取的字段
         params.put("fields", "f2,f3,f8,f12,f14,f20,f26");
         params.put("_", "1623833739532");
 
@@ -136,11 +137,9 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         // 获取一级分类所有code
         List<ASwDict> codeList = aSwDictService.lambdaQuery().like(ASwDict::getType, "一").list();
-        // List<ASwDict> code2List = aSwDictService.lambdaQuery().like(ASwDict::getType, "二").list();
 
         // 获取一级分类所有股票
         List<ASw> alist = aSwService.lambdaQuery().like(ASw::getIndustryType, "一").list();
-        // List<ASw> alist2 = aSwService.lambdaQuery().like(ASw::getIndustryType, "二").list();
 
         // 根据code获取所有分类下的股票
         codeList.forEach(item -> {
@@ -281,6 +280,18 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
             aTodayList.add(aToday);
         }
         return ApiResult.success().data(aTodayList);
+    }
+
+    @Override
+    public ApiResult getSection() {
+        ADataJson todayData = aDataJsonService.getTodayData();
+
+        if (todayData != null) {
+            JSONArray jsonObject = JSONArray.parseArray(todayData.getSection());
+            return ApiResult.success().data(jsonObject);
+        }
+
+        return getTodayInfo();
     }
 
 }
