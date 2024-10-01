@@ -31,7 +31,7 @@ public class ADataJsonServiceImpl extends ServiceImpl<ADataJsonMapper, ADataJson
 
     @Override
     public ADataJson getTodayData() {
-        return this.lambdaQuery().eq(ADataJson::getToday, DateUtil.today()).one();
+        return this.lambdaQuery().orderByDesc(ADataJson::getId).last("limit 1").one();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ADataJsonServiceImpl extends ServiceImpl<ADataJsonMapper, ADataJson
     }
 
     /**
-     * 组装板块数据
+     * 组装二级板块数据
      *
      * @param aDataJson 数据json
      * @return {@link JSONObject }

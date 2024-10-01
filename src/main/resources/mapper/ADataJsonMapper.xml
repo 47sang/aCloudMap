@@ -2,17 +2,4 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.galigeigei.acloudmap.mapper.ADataJsonMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.galigeigei.acloudmap.entity.ADataJson">
-        <id column="id" property="id" />
-        <result column="json" property="json" />
-        <result column="today" property="today" />
-        <result column="creat_time" property="creatTime" />
-    </resultMap>
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id, json, today, creat_time
-    </sql>
-
 </mapper>

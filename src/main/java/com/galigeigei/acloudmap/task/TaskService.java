@@ -1,12 +1,17 @@
 package com.galigeigei.acloudmap.task;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson2.JSONObject;
+import com.galigeigei.acloudmap.entity.AHoliday;
+import com.galigeigei.acloudmap.service.AHolidayService;
 import com.galigeigei.acloudmap.service.AInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * 定时任务
@@ -21,10 +26,39 @@ public class TaskService {
     @Resource
     private AInfoService aInfoService;
 
+    @Resource
+    private AHolidayService aHolidayService;
+
     // 上午开盘期间
     @Scheduled(cron = "2 0-59/1 9-15 * * 1-5")
     public void refreshTheStockInfo1() {
-        timeLog();
+        // 判断今天是否为节假日
+        Optional<AHoliday> aHoliday = aHolidayService.lambdaQuery().eq(AHoliday::getDate, DateUtil.today()).oneOpt();
+
+        if (aHoliday.isPresent()) {
+            Boolean holiday = aHoliday.get().getHoliday();
+            if (!holiday) {
+                log.info("今天是节假日");
+                timeLog();
+            }
+        } else {
+            String HOLIDAY_API = "https://timor.tech/api/holiday/info/" + DateUtil.today();
+
+            String result = HttpUtil.get(HOLIDAY_API);
+            JSONObject jsonObject = JSONObject.parseObject(result);
+
+            JSONObject holiday = jsonObject.getJSONObject("holiday");
+            AHoliday recod = new AHoliday();
+            recod.setDate(DateUtil.today());
+            recod.setName(holiday.getString("name"));
+            recod.setHoliday(holiday.getBoolean("holiday"));
+
+            aHolidayService.save(recod);
+            if (!holiday.getBoolean("holiday")) {
+                timeLog();
+            }
+        }
+
     }
 
     /**
