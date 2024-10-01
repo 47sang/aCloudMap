@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * 个股涨跌数据
  * @author 周士钰
  * @date 2024/9/30 下午9:06
  */
