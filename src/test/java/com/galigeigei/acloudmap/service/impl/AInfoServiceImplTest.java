@@ -57,7 +57,9 @@ public class AInfoServiceImplTest {
 
         String resultStr = HttpUtil.get(API_URL, params);
 
-        JSONArray jsonArray = JSONObject.parseObject(resultStr).getJSONObject("data").getJSONArray("diff");
+        String replace = resultStr.replace("\"-\"", "0");
+
+        JSONArray jsonArray = JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
 
         List<AInfo> aInfoList = aInfoService.list();
 
