@@ -1,4 +1,4 @@
-package com.galigeigei.acloudmap.entity;
+package com.galigeigei.acloudmap.entity.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

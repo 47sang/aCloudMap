@@ -51,7 +51,7 @@ public class AToday implements Serializable {
     private Double price;
 
     /**
-     * 涨跌幅
+     * 涨跌幅%
      */
     private Double increase;
 

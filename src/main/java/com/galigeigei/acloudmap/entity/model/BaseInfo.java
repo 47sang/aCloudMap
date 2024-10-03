@@ -1,11 +1,11 @@
-package com.galigeigei.acloudmap.entity;
+package com.galigeigei.acloudmap.entity.model;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 股票基础信息
+ * 东方财富接口,个股基础信息
  *
  * @author 周士钰
  * @date 2024/7/26 上午11:13

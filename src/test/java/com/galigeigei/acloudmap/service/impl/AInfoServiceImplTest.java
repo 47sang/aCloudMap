@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.galigeigei.acloudmap.entity.AInfo;
 import com.galigeigei.acloudmap.entity.ASw;
-import com.galigeigei.acloudmap.entity.BaseInfo;
+import com.galigeigei.acloudmap.entity.model.BaseInfo;
 import com.galigeigei.acloudmap.service.AInfoService;
 import com.galigeigei.acloudmap.service.ASwService;
 import org.junit.Assert;

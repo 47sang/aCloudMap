@@ -7,6 +7,9 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.galigeigei.acloudmap.entity.*;
+import com.galigeigei.acloudmap.entity.model.BaseInfo;
+import com.galigeigei.acloudmap.entity.model.SectionBO;
+import com.galigeigei.acloudmap.entity.model.SectionBarVo;
 import com.galigeigei.acloudmap.mapper.AInfoMapper;
 import com.galigeigei.acloudmap.service.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +19,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -314,22 +318,34 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
         sortList.sort(Comparator.comparingDouble(SectionBO.ChildrenDTO::getTurnover));
 
-        //板块名称
+        // 板块名称
         List<String> nameList = new ArrayList<>();
-        //当前市值
+        // 当前市值
         List<Double> valueList = new ArrayList<>();
-        //昨日市值=当前市值-涨跌额
+        // 昨日市值=当前市值-涨跌额
         List<Double> valueList2 = new ArrayList<>();
-        //涨跌额
+        // 涨跌额
         List<Double> valueList3 = new ArrayList<>();
 
+        // AtomicReference<Double> total = new AtomicReference<>(0.0);
+        // AtomicReference<Double> total2 = new AtomicReference<>(0.0);
+        // AtomicReference<Double> total3 = new AtomicReference<>(0.0);
 
         sortList.forEach(item -> {
-            nameList.add(item.getName()+"("+BigDecimal.valueOf(item.getIncrease()).setScale(2, RoundingMode.HALF_UP)+"%)");
+            nameList.add(item.getName() + "(" + BigDecimal.valueOf(item.getIncrease()).setScale(2, RoundingMode.HALF_UP) + "%)");
             valueList.add(BigDecimal.valueOf(item.getTotal() / 100000000.0).setScale(2, RoundingMode.HALF_UP).doubleValue());
-            valueList2.add(BigDecimal.valueOf((item.getTotal() - item.getTurnover())/100000000).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            valueList2.add(BigDecimal.valueOf((item.getTotal() - item.getTurnover()) / 100000000).setScale(2, RoundingMode.HALF_UP).doubleValue());
             valueList3.add(BigDecimal.valueOf(item.getTurnover() / 100000000.0).setScale(2, RoundingMode.HALF_UP).doubleValue());
+
+            // total.updateAndGet(v -> v + item.getTotal());
+            // total2.updateAndGet(v -> v + (item.getTotal() - item.getTurnover()));
+            // total3.updateAndGet(v -> v + item.getTurnover());
         });
+
+        // nameList.add(nameList.size(), "总市值");
+        // valueList.add(valueList.size(), BigDecimal.valueOf(total.get() / 100000000.0).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        // valueList2.add(valueList2.size(), BigDecimal.valueOf(total2.get() / 100000000.0).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        // valueList3.add(valueList3.size(), BigDecimal.valueOf(total3.get() / 100000000.0).setScale(2, RoundingMode.HALF_UP).doubleValue());
 
         SectionBarVo vo = new SectionBarVo();
         vo.setCategoryName(nameList);
