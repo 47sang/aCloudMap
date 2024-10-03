@@ -7,6 +7,7 @@ import com.galigeigei.acloudmap.entity.AHoliday;
 import com.galigeigei.acloudmap.service.AHolidayService;
 import com.galigeigei.acloudmap.service.AInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,9 @@ public class TaskService {
     @Resource
     private AHolidayService aHolidayService;
 
+    @Value("${parameters.holidayUrl}")
+    private String HOLIDAY;
+
     // 上午开盘期间
     @Scheduled(cron = "2 0-59/1 9-15 * * 1-5")
     public void refreshTheStockInfo1() {
@@ -42,7 +46,7 @@ public class TaskService {
                 timeLog();
             }
         } else {
-            String HOLIDAY_API = "https://timor.tech/api/holiday/info/" + DateUtil.today();
+            String HOLIDAY_API = HOLIDAY + DateUtil.today();
 
             String result = HttpUtil.get(HOLIDAY_API);
             JSONObject jsonObject = JSONObject.parseObject(result);
