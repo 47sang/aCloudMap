@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.galigeigei.acloudmap.entity.*;
 import com.galigeigei.acloudmap.mapper.AInfoMapper;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -292,6 +295,49 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
         }
 
         return getTodayInfo();
+    }
+
+    @Override
+    public ApiResult getSectionBar() {
+
+        ADataJson todayData = aDataJsonService.getTodayData();
+        List<SectionBO> sectionBO = JSONObject.parseObject(todayData.getSection(), new TypeReference<List<SectionBO>>() {
+        });
+
+        List<SectionBO.ChildrenDTO> sortList = new ArrayList<>();
+
+
+        sectionBO.forEach(item -> {
+            List<SectionBO.ChildrenDTO> aChildrenDTO = item.getChildren();
+            sortList.addAll(aChildrenDTO);
+        });
+
+        sortList.sort(Comparator.comparingDouble(SectionBO.ChildrenDTO::getTurnover));
+
+        //板块名称
+        List<String> nameList = new ArrayList<>();
+        //当前市值
+        List<Double> valueList = new ArrayList<>();
+        //昨日市值=当前市值-涨跌额
+        List<Double> valueList2 = new ArrayList<>();
+        //涨跌额
+        List<Double> valueList3 = new ArrayList<>();
+
+
+        sortList.forEach(item -> {
+            nameList.add(item.getName()+"("+BigDecimal.valueOf(item.getIncrease()).setScale(2, RoundingMode.HALF_UP)+"%)");
+            valueList.add(BigDecimal.valueOf(item.getTotal() / 100000000.0).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            valueList2.add(BigDecimal.valueOf((item.getTotal() - item.getTurnover())/100000000).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            valueList3.add(BigDecimal.valueOf(item.getTurnover() / 100000000.0).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        });
+
+        SectionBarVo vo = new SectionBarVo();
+        vo.setCategoryName(nameList);
+        vo.setNowNum(valueList);
+        vo.setYesterdayNum(valueList2);
+        vo.setChangeAmount(valueList3);
+
+        return ApiResult.success().data(vo);
     }
 
 }

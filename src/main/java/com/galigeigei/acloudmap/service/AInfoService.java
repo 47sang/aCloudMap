@@ -42,4 +42,12 @@ public interface AInfoService extends IService<AInfo> {
      * @return {@link ApiResult }
      */
     ApiResult getSection();
+
+
+    /**
+     * 获取二级板块正负条形图数据
+     *
+     * @return {@link ApiResult }
+     */
+    ApiResult getSectionBar();
 }

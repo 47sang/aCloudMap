@@ -39,6 +39,11 @@ public class AInfoController {
         return aInfoService.getSection();
     }
 
+    @GetMapping("/sectionBar")
+    public ApiResult getSectionBar(){
+        return aInfoService.getSectionBar();
+    }
+
 
 }
 

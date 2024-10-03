@@ -25,4 +25,9 @@ public class IndexController {
     public String section() {
         return "section.html";
     }
+
+    @RequestMapping("/sectionBar")
+    public String sectionBar() {
+        return "sectionBar.html";
+    }
 }

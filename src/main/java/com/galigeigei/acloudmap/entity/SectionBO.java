@@ -53,15 +53,15 @@ public class SectionBO implements Serializable {
          */
         private String name;
         /**
-         * total
+         * 当前市值
          */
         private double total;
         /**
-         * 涨跌额
+         * 涨跌幅%
          */
         private double increase;
         /**
-         * 涨跌幅%
+         * 涨跌额
          */
         private double turnover;
         /**
