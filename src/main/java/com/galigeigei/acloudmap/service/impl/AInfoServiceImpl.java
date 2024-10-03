@@ -19,7 +19,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -316,7 +315,17 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
             sortList.addAll(aChildrenDTO);
         });
 
-        sortList.sort(Comparator.comparingDouble(SectionBO.ChildrenDTO::getTurnover));
+        // 按照涨跌额排序
+        sortList.sort(Comparator.comparingDouble(SectionBO.ChildrenDTO::getTurnover).reversed());
+
+        // 按照增长市值添加顺序号
+        for (int i = 0; i < sortList.size(); i++) {
+            String newName = i + 1 + "." + sortList.get(i).getName();
+            sortList.get(i).setName(newName);
+        }
+
+        // 按照总市值排序
+        sortList.sort(Comparator.comparingDouble(SectionBO.ChildrenDTO::getTotal));
 
         // 板块名称
         List<String> nameList = new ArrayList<>();
