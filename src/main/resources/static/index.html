@@ -115,7 +115,7 @@
                     },
                     tooltip: {
                         formatter: function (info) {
-                            let value = info.value;
+                            // let value = info.value;
                             let data = info.data;
                             let amount = data.total;
                             amount = isValidNumber(amount)
@@ -147,13 +147,14 @@
                                 show: true,
                                 formatter: function (params) {
                                     return params.data.name + '\n' + params.data.increase + '%'; // 显示名称和值
-                                }
+                                },
+                                fontSize: 16
                             },
                             animation: false, // 关闭动画
                             // leafDepth: 2, // 设置叶子深度
                             // roam: false, // 禁用漫游和缩放
                             itemStyle: {
-                                borderColor: 'black'
+                                borderColor: 'black',
                             },
                             levels: [
                                 {

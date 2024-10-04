@@ -150,7 +150,8 @@
                                     let change = params.data.increase;
                                     change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
                                     return params.data.name + '\n' + change; // 显示名称和值
-                                }
+                                },
+                                fontSize: 16
                             },
                             animation: false, // 关闭动画
                             // leafDepth: 2, // 设置叶子深度
