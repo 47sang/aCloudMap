@@ -54,11 +54,15 @@ public class TaskService {
             JSONObject holiday = jsonObject.getJSONObject("holiday");
             AHoliday recod = new AHoliday();
             recod.setDate(DateUtil.today());
-            recod.setName(holiday.getString("name"));
-            recod.setHoliday(holiday.getBoolean("holiday"));
+            if (holiday != null) {
+                recod.setName(holiday.getString("name"));
+                recod.setHoliday(holiday.getBoolean("holiday"));
+            }else {
+                recod.setHoliday(false);
+            }
 
             aHolidayService.save(recod);
-            if (!holiday.getBoolean("holiday")) {
+            if (!recod.getHoliday()) {
                 timeLog();
             }
         }
