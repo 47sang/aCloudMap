@@ -56,7 +56,7 @@ public class ADataJsonServiceImpl extends ServiceImpl<ADataJsonMapper, ADataJson
     private String assembledSection(String aDataJson) {
 
 
-        ADataJson data = this.lambdaQuery().eq(ADataJson::getToday, DateUtil.yesterday().toDateStr()).oneOpt().orElseGet(ADataJson::new);
+        ADataJson data = this.lambdaQuery().orderByDesc(ADataJson::getId).last("limit 2").list().get(1);
 
         if (data.getJson() != null) {
             // 昨日数据
