@@ -1,16 +1,19 @@
 mod handlers;
 mod models;
 mod services;
+mod task;
 
-use actix_cors::Cors;
-use actix_web::{web, App, HttpServer};
-use dotenv::dotenv;
-use sqlx::MySqlPool;
 use std::env;
 use std::sync::Arc;
+use log::error;
+use actix_web::{web,App, HttpServer};
+use actix_cors::Cors;
+use dotenv::dotenv;
+use sqlx::MySqlPool;
 
 use crate::handlers::stock_handler;
 use crate::services::stock_service::StockService;
+use crate::task::TaskService;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -26,8 +29,21 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Failed to connect to database");
 
+        
+    // 获取节假日API URL
+    let holiday_url = std::env::var("HOLIDAY_URL").expect("HOLIDAY_URL must be set");
+    
+    // 初始化并启动定时任务
+    let task_service = TaskService::new(pool.clone(), holiday_url);
+    tokio::spawn(async move {
+        if let Err(e) = task_service.start_scheduler().await {
+            error!("Failed to start scheduler: {}", e);
+        }
+    });
+    
     let pool = Arc::new(pool);
     let service = StockService::new(pool);
+
 
     println!("Server running at http://localhost:8080");
 
