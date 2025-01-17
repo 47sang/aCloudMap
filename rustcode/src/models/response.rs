@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiResponse<T> {
     pub code: i16,
-    pub message: String,
+    pub msg: String,
     pub data: Option<T>,
 }
 
@@ -14,7 +14,7 @@ impl<T> ApiResponse<T> {
     pub fn success(data: T) -> Self {
         Self {
             code: 200,
-            message: "成功".to_string(),
+            msg: "成功".to_string(),
             data: Some(data),
         }
     }
@@ -23,8 +23,17 @@ impl<T> ApiResponse<T> {
     pub fn fail(msg: &str) -> Self {
         Self {
             code: 500,
-            message: msg.to_string(),
+            msg: msg.to_string(),
             data: None,
         }
     }
-} 
+
+    /// 失败
+    pub fn fail_with_code(code: i16, msg: &str) -> Self {
+        Self {
+            code: code,
+            msg: msg.to_string(),
+            data: None,
+        }
+    }
+}

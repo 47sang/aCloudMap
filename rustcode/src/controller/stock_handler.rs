@@ -1,5 +1,5 @@
+use crate::services::db_service::StockService;
 use actix_web::{get, web, HttpResponse, Responder};
-use crate::services::stock_service::StockService;
 
 /// 获取一二级分类整理后的所有股票信息
 #[get("/all")]
@@ -27,4 +27,12 @@ pub async fn get_section(service: web::Data<StockService>) -> impl Responder {
 pub async fn get_section_bar(service: web::Data<StockService>) -> impl Responder {
     let result = service.get_section_bar().await;
     HttpResponse::Ok().json(result)
-} 
+}
+
+pub fn init_routes(config: &mut web::ServiceConfig) {
+    config
+        .service(get_all_info)
+        .service(get_sort_info)
+        .service(get_section)
+        .service(get_section_bar)
+}
