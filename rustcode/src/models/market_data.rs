@@ -1,5 +1,7 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use sqlx::FromRow;
 
 /// 今日数据
 #[derive(Debug, Serialize, Deserialize)]
@@ -31,22 +33,22 @@ pub struct AToday {
 }
 
 /// 每日数据
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct ADataJson {
     /// 主键
     pub id: i32,
     /// 个股数据
-    pub json: Option<String>,
+    pub json: Option<Value>,
     /// 板块数据
-    pub section: Option<String>,
+    pub section: Option<Value>,
     /// 数据日期
     pub today: Option<String>,
     /// 创建时间
     pub creat_time: Option<chrono::NaiveDateTime>,
-} 
+}
 
 /// 节假日表
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct AHoliday {
     /// 主键
     pub id: i32,

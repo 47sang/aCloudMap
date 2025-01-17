@@ -8,6 +8,7 @@ version = "0.1.0"
 dependencies = [
  "actix-cors",
  "actix-web",
+ "anyhow",
  "chrono",
  "dotenv",
  "env_logger",
@@ -290,6 +291,12 @@ checksum = "819e7219dbd41043ac279b19830f2efc897156490d7fd6ea916720117ee66311"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "anyhow"
+version = "1.0.95"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 
 [[package]]
 name = "atoi"

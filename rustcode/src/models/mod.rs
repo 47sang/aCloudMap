@@ -1,3 +1,5 @@
+#[allow(unused_imports)]
+
 mod api_param;
 mod data_bo;
 mod data_vo;

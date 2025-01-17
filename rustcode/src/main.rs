@@ -56,15 +56,15 @@ async fn main() -> std::io::Result<()> {
     let pool = Arc::new(pool);
     let service = DbService::new(pool);
     // 获取节假日API URL
-    let holiday_url = std::env::var("HOLIDAY_URL").expect("HOLIDAY_URL must be set");
+    // let holiday_url = env::var("HOLIDAY_URL").expect("HOLIDAY_URL must be set");
 
     // 初始化并启动定时任务
-    let task_service = TaskService::new(pool.clone(), holiday_url);
-    tokio::spawn(async move {
-        if let Err(e) = task_service.start_scheduler().await {
-            error!("Failed to start scheduler: {}", e);
-        }
-    });
+    // let task_service = TaskService::new(pool.clone(), holiday_url);
+    // tokio::spawn(async move {
+    //     if let Err(e) = task_service.start_scheduler().await {
+    //         error!("Failed to start scheduler: {}", e);
+    //     }
+    // });
 
     HttpServer::new(move || {
         App::new()
