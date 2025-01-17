@@ -1,6 +1,5 @@
 package com.galigeigei.acloudmap.service;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.galigeigei.acloudmap.entity.ADataJson;
 
