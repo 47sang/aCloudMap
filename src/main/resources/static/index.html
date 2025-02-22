@@ -141,18 +141,28 @@
                     series: [
                         {
                             name: 'A股',
-                            top: 80,
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
                             type: 'treemap',
                             label: {
                                 show: true,
                                 formatter: function (params) {
-                                    return params.data.name + '\n' + params.data.increase + '%'; // 显示名称和值
+                                    return params.data.name + '\n￥'+ params.data.price + '\n' + params.data.increase + '%'; // 显示名称和值
                                 },
                                 fontSize: 16
                             },
                             animation: false, // 关闭动画
-                            // leafDepth: 2, // 设置叶子深度
-                            // roam: false, // 禁用漫游和缩放
+                            roam: true, // 启用缩放和平移
+                            scaleLimit: {  // 设置缩放限制
+                                min: 1,    // 最小缩放比例为1，即不允许缩小到小于容器大小
+                                max: 5     // 最大放大5倍
+                            },
+                            nodeClick: false, // 禁用节点点击
+                            breadcrumb: {    // 禁用面包屑导航
+                                show: false
+                            },
                             itemStyle: {
                                 borderColor: 'black',
                             },
