@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -59,28 +60,48 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
     @Override
     public ApiResult getTodayInfo() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("pn", "1");
-        params.put("pz", "7000");
-        params.put("po", "1");
-        params.put("np", "1");
-        params.put("ut", "bd1d9ddb04089700cf9c27f6f7426281");
-        params.put("fltt", "2");
-        params.put("invt", "2");
-        // 排序条件
-        params.put("fid", "f3");
-        params.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
-        // 获取的字段
-        params.put("fields", "f2,f3,f8,f12,f14,f20,f26");
-        params.put("_", "1623833739532");
+        // 创建一个CompletableFuture列表来存储异步任务
+        List<CompletableFuture<JSONArray>> futures = new ArrayList<>();
+        
+        // 创建6个并发请求
+        for (int page = 1; page <= 29; page++) {
+            int finalPage = page;
+            CompletableFuture<JSONArray> future = CompletableFuture.supplyAsync(() -> {
+                Map<String, Object> params = new HashMap<>();
+                params.put("pn", String.valueOf(finalPage));
+                params.put("pz", "200");
+                params.put("po", "1");
+                params.put("np", "1");
+                params.put("ut", "bd1d9ddb04089700cf9c27f6f7426281");
+                params.put("fltt", "2");
+                params.put("invt", "2");
+                // 排序条件
+                params.put("fid", "f3");
+                params.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
+                // 获取的字段
+                params.put("fields", "f2,f3,f8,f12,f14,f20,f26");
+                // params.put("_", System.currentTimeMillis());
 
-        String resultStr = HttpUtil.get(API_URL, params);
+                String resultStr = HttpUtil.get(API_URL, params);
+                String replace = resultStr.replace("\"-\"", "0");
+                return JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
+            });
+            futures.add(future);
+        }
 
-        String replace = resultStr.replace("\"-\"", "0");
+        // 等待所有请求完成并合并结果
+        JSONArray mergedArray = new JSONArray();
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        futures.forEach(future -> {
+            try {
+                JSONArray result = future.get();
+                mergedArray.addAll(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
-        JSONArray jsonArray = JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
-
-        List<AToday> aTodayList = updateTodayInfo(jsonArray);
+        List<AToday> aTodayList = updateTodayInfo(mergedArray);
 
         List<Object> dataJson = setDataToMap(aTodayList);
 
@@ -234,36 +255,50 @@ public class AInfoServiceImpl extends ServiceImpl<AInfoMapper, AInfo> implements
 
     @Override
     public ApiResult getSortInfo() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("pn", "1");
-        params.put("pz", "7000");
-        params.put("po", "1");
-        params.put("np", "1");
-        params.put("ut", "bd1d9ddb04089700cf9c27f6f7426281");
-        params.put("fltt", "2");
-        params.put("invt", "2");
-        params.put("fid", "f20");
-        params.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
-        params.put("fields", "f2,f3,f8,f12,f14,f20,f26");
-        params.put("_", "1623833739532");
+        // 创建一个CompletableFuture列表来存储异步任务
+        List<CompletableFuture<JSONArray>> futures = new ArrayList<>();
+        
+        // 创建6个并发请求
+        for (int page = 1; page <= 29; page++) {
+            int finalPage = page;
+            CompletableFuture<JSONArray> future = CompletableFuture.supplyAsync(() -> {
+                Map<String, Object> params = new HashMap<>();
+                params.put("pn", String.valueOf(finalPage));
+                params.put("pz", "200");
+                params.put("po", "1");
+                params.put("np", "1");
+                params.put("ut", "bd1d9ddb04089700cf9c27f6f7426281");
+                params.put("fltt", "2");
+                params.put("invt", "2");
+                params.put("fid", "f20");
+                params.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
+                params.put("fields", "f2,f3,f8,f12,f14,f20,f26");
+                params.put("_", System.currentTimeMillis());
 
-        String resultStr = HttpUtil.get(API_URL, params);
+                String resultStr = HttpUtil.get(API_URL, params);
+                String replace = resultStr.replace("\"-\"", "0");
+                return JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
+            });
+            futures.add(future);
+        }
 
-        String replace = resultStr.replace("\"-\"", "0");
+        // 等待所有请求完成并合并结果
+        JSONArray mergedArray = new JSONArray();
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        futures.forEach(future -> {
+            try {
+                JSONArray result = future.get();
+                mergedArray.addAll(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
-        JSONArray jsonArray = JSONObject.parseObject(replace).getJSONObject("data").getJSONArray("diff");
         List<AToday> aTodayList = new ArrayList<>();
-
-
-        ArrayList<Object> objects = new ArrayList<>(jsonArray);
-
-        for (int i = 0; i < objects.size(); i++) {
-
-
-            BaseInfo baseInfo = JSONObject.parseObject(JSONObject.toJSONString(objects.get(i)), BaseInfo.class);
+        for (int i = 0; i < mergedArray.size(); i++) {
+            BaseInfo baseInfo = JSONObject.parseObject(JSONObject.toJSONString(mergedArray.get(i)), BaseInfo.class);
 
             AToday aToday = new AToday();
-
 
             aToday.setId(i + 1);
             aToday.setCode(baseInfo.getF12());
