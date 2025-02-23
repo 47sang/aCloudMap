@@ -1,38 +1,39 @@
 use chrono::Local;
 use log::{error, info};
 use serde_json::Value;
-use sqlx::sqlite::SqlitePool;
+use sea_orm::{DatabaseConnection, EntityTrait, ColumnTrait, QueryFilter, ActiveModelTrait, Set};
 use std::sync::Arc;
 use std::time::Instant;
 use tokio_cron_scheduler::{Job, JobScheduler};
 
-use crate::models::AHoliday;
+use crate::entities::prelude::*;
+use crate::entities::holiday::{self, Column};
 
 #[derive(Clone)]
 pub struct TaskService {
-    pool: Arc<SqlitePool>,
+    db: Arc<DatabaseConnection>,
     holiday_url: String,
 }
 
 impl TaskService {
-    pub fn new(pool: Arc<SqlitePool>, holiday_url: String) -> Self {
-        Self { pool, holiday_url }
+    pub fn new(db: Arc<DatabaseConnection>, holiday_url: String) -> Self {
+        Self { db, holiday_url }
     }
 
     pub async fn start_scheduler(&self) -> Result<(), Box<dyn std::error::Error>> {
         let sched = JobScheduler::new().await?;
 
-        let pool = self.pool.clone();
+        let db = self.db.clone();
         let holiday_url = self.holiday_url.clone();
 
         // 创建定时任务 "2 0-59/1 9-15 * * 1-5"
         sched
             .add(Job::new_async("2 0-59/1 9-15 * * 1-5", move |_, _| {
-                let pool = pool.clone();
+                let db = db.clone();
                 let holiday_url = holiday_url.clone();
 
                 Box::pin(async move {
-                    let task_service = TaskService::new(pool, holiday_url);
+                    let task_service = TaskService::new(db, holiday_url);
                     if let Err(e) = task_service.refresh_stock_info().await {
                         error!("刷新股票信息失败: {}", e);
                     }
@@ -76,17 +77,15 @@ impl TaskService {
     }
 
     async fn check_holiday(&self, date: &str) -> Result<Option<bool>, Box<dyn std::error::Error>> {
-        let sql = format!("SELECT * FROM a_holiday WHERE date = {}", date);
-        // 首先检查数据库中是否已有记录
-        let holiday = sqlx::query_as::<_, AHoliday>(&sql)
-            .fetch_optional(&*self.pool)
+        let holiday = Holiday::find()
+            .filter(Column::Date.eq(date))
+            .one(&*self.db)
             .await?;
 
         if let Some(record) = holiday {
             return Ok(Some(record.holiday));
         }
 
-        // 如果数据库中没有记录，则请求API
         let url = format!("{}{}", self.holiday_url, date);
         let response = reqwest::get(&url).await?.json::<Value>().await?;
 
@@ -103,17 +102,14 @@ impl TaskService {
             }
         }
 
-        let sql = format!(
-            "INSERT INTO a_holiday (date, holiday, name) VALUES ({}, {}, {})",
-            date,
-            is_holiday,
-            holiday_name
-        );
+        let holiday = holiday::ActiveModel {
+            date: Set(Some(date.to_string())),
+            holiday: Set(is_holiday),
+            name: Set(Some(holiday_name)),
+            ..Default::default()
+        };
 
-        // 保存到数据库
-        sqlx::query(&sql)
-            .execute(&*self.pool)
-            .await?;
+        holiday.insert(&*self.db).await?;
 
         Ok(Some(is_holiday))
     }

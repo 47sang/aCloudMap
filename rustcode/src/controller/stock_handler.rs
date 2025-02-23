@@ -19,11 +19,16 @@ async fn handle_db_result<T: Serialize, E: std::error::Error + std::fmt::Display
     HttpResponse::Ok().json(response)
 }
 
+#[get("/demo")]
+pub async fn get_demo() -> impl Responder {
+    HttpResponse::Ok().json(ApiResponse::success("demo"))
+}
+
 /// 获取一二级分类整理后的所有股票信息
 #[get("/all")]
 pub async fn get_all_info(db: web::Data<DbService>) -> impl Responder {
-  let section = db.get_json_only().await.unwrap();
-  HttpResponse::Ok().json(ApiResponse::success(section.json))
+  let section = db.get_json_only().await;
+  handle_db_result(section).await
 }
 
 /// 按照市值排序的股票信息
@@ -31,7 +36,7 @@ pub async fn get_all_info(db: web::Data<DbService>) -> impl Responder {
 pub async fn get_sort_info() -> impl Responder {
     let params = HashMap::from([
         ("pn", "1"),
-        ("pz", "7000"),
+        ("pz", "200"),
         ("po", "1"),
         ("np", "1"),
         ("ut", "bd1d9ddb04089700cf9c27f6f7426281"),
@@ -112,6 +117,7 @@ pub async fn get_section_bar(db: web::Data<DbService>) -> impl Responder {
 
 pub fn init_routes(config: &mut web::ServiceConfig) {
     config
+        .service(get_demo)
         .service(get_all_info)
         .service(get_sort_info)
         .service(get_section)

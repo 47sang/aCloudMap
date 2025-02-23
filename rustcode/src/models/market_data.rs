@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::FromRow;
+use sea_orm::FromQueryResult;
 
 /// 今日数据
 #[derive(Debug, Serialize, Deserialize)]
@@ -33,7 +33,7 @@ pub struct AToday {
 }
 
 /// 每日数据
-#[derive(Debug, FromRow, Serialize, Deserialize)]
+#[derive(Debug, FromQueryResult, Serialize, Deserialize)]
 pub struct ADataJson {
     /// 主键
     pub id: i32,
@@ -48,7 +48,7 @@ pub struct ADataJson {
 }
 
 /// 节假日表
-#[derive(Debug, FromRow, Serialize, Deserialize)]
+#[derive(Debug, FromQueryResult, Serialize, Deserialize)]
 pub struct AHoliday {
     /// 主键
     pub id: i32,

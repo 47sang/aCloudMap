@@ -3,18 +3,19 @@ mod models;
 mod services;
 mod task;
 mod config;
+mod entities;
 
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use log::{error, info};
-use sqlx::SqlitePool;
+use sea_orm::{Database, DatabaseConnection, ConnectionTrait};
 use std::env;
 use std::sync::Arc;
 
 use config::create_sql::create_sql;
 use controller::stock_handler;
 use services::db_service::DbService;
-use task::TaskService;
+use task::task_cron::TaskService;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -27,39 +28,42 @@ async fn main() -> std::io::Result<()> {
 
     env_logger::init();
 
-    // 数据库连接（这里使用示例URL，实际使用时需要从环境变量获取）
+    // 数据库连接配置
     let database_url = env::var("DATABASE_URL").expect("没有配置数据库连接");
-
-    // 尝试连接数据库，如果数据库文件不存在，则创建它
-    if !std::path::Path::new(&database_url).exists() {
-        // 创建数据库文件
-        match std::fs::File::create(&database_url) {
-            Ok(_) => info!("数据库文件创建成功"),
-            Err(e) => panic!("创建数据库文件失败: {}", e),
-        }
-
-        info!("表创建成功");
+    // 将相对路径转换为绝对路径
+    let database_path = std::path::Path::new(&database_url);
+    let absolute_path = if database_path.is_relative() {
+        std::env::current_dir()?.join(database_path)
+    } else {
+        database_path.to_path_buf()
+    };
+    
+    // 构建 SQLite 连接 URL
+    let database_url = format!("sqlite:{}?mode=rwc", absolute_path.display());
+    
+    // 确保数据库目录存在
+    if let Some(parent) = absolute_path.parent() {
+        std::fs::create_dir_all(parent)?;
     }
 
-    let pool = SqlitePool::connect(&database_url)
+    // 尝试连接数据库，如果数据库文件不存在会自动创建
+    let db: DatabaseConnection = Database::connect(&database_url)
         .await
         .expect("无法连接到数据库");
-    // 从文件中读取 SQL 语句
-    // let create_table_sql = include_str!("../create_tables.sql");
 
-    // 在这里执行创建表的 SQL 语句
-    sqlx::query(&create_sql())
-        .execute(&pool)
+    // 执行创建表的 SQL 语句
+    db.execute_unprepared(&create_sql())
         .await
         .expect("创建表失败");
 
-    let pool = Arc::new(pool);
-    let service = DbService::new(pool);
+    let db = Arc::new(db);
+    let service = DbService::new(db.clone());
+
     // 获取节假日API URL
     // let holiday_url = env::var("HOLIDAY_URL").expect("HOLIDAY_URL must be set");
 
     // 初始化并启动定时任务
-    // let task_service = TaskService::new(pool.clone(), holiday_url);
+    // let task_service = TaskService::new(db.clone(), holiday_url);
     // tokio::spawn(async move {
     //     if let Err(e) = task_service.start_scheduler().await {
     //         error!("Failed to start scheduler: {}", e);
