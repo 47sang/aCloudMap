@@ -138,7 +138,7 @@
                         <configuration>
                             <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
                              <!--<url><![CDATA[scp://root:qwe@192.168.5.13:22/opt/acloudmap]]></url>-->
-                            <url><![CDATA[scp://root:lykj@192.168.5.13:902/opt/acloudmap]]></url>
+                            <url><![CDATA[scp://root:lykj@192.168.31.60:22/opt/acloudmap]]></url>
                         </configuration>
                     </execution>
                 </executions>

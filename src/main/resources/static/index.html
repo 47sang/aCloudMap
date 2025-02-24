@@ -28,9 +28,9 @@
     // var API_PATH = './data.json';
     var option;
 
-    myChart.showLoading();
-    const household_america_2012 = 113616229;
-    $.get(API_PATH, function (jsonData) {
+    function fetchAndUpdateData() {
+        myChart.showLoading();
+        $.get(API_PATH, function (jsonData) {
             myChart.hideLoading();
 
             convertData(jsonData.data);
@@ -195,12 +195,14 @@
                     ]
                 })
             );
-        }
-    );
-
-    if (option && typeof option === 'object') {
-        myChart.setOption(option);
+        });
     }
+
+    // 初始加载
+    fetchAndUpdateData();
+
+    // 设置30秒定时刷新
+    setInterval(fetchAndUpdateData, 30000);
 
     window.addEventListener('resize', myChart.resize);
 </script>
