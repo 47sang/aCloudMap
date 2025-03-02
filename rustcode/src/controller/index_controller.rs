@@ -1,11 +1,10 @@
-use crate::models::{ADataJson, AInfo, ASwDict, AToday, ApiResponse, BaseInfo};
+use crate::models::{AToday, ApiResponse, BaseInfo};
 use crate::services::db_service::DbService;
 use actix_web::{get, web, HttpResponse, Responder};
 use reqwest::Client;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::env;
-use anyhow::Error;
 use serde_json::Value;
 
 /// 辅助函数：将 Result 转换为 HTTP 响应
@@ -113,7 +112,6 @@ pub async fn get_section_bar(db: web::Data<DbService>) -> impl Responder {
 
 pub fn init_routes(config: &mut web::ServiceConfig) {
     config
-        .service(get_demo)
         .service(get_all_info)
         .service(get_sort_info)
         .service(get_section)
