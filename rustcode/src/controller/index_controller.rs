@@ -19,16 +19,13 @@ async fn handle_db_result<T: Serialize, E: std::error::Error + std::fmt::Display
     HttpResponse::Ok().json(response)
 }
 
-#[get("/demo")]
-pub async fn get_demo() -> impl Responder {
-    HttpResponse::Ok().json(ApiResponse::success("demo"))
-}
 
 /// 获取一二级分类整理后的所有股票信息
 #[get("/all")]
 pub async fn get_all_info(db: web::Data<DbService>) -> impl Responder {
-  let section = db.get_json_only().await;
-  handle_db_result(section).await
+  let section = db.get_json_only().await.expect("获取今日数据失败");
+  let json: Value = serde_json::from_str::<Value>(&section.json.unwrap()).expect("json解析失败");
+  HttpResponse::Ok().json(ApiResponse::success(json))
 }
 
 /// 按照市值排序的股票信息
@@ -53,9 +50,7 @@ pub async fn get_sort_info() -> impl Responder {
         .query(&params)
         .send()
         .await;
-    let result = result
-        .unwrap()
-        .text()
+    let result = result.expect("获取数据请求失败").text()
         .await
         .expect("东方财富接口获取数据失败")
         .replace("\"-\"", "0");
@@ -76,8 +71,8 @@ pub async fn get_sort_info() -> impl Responder {
             code: base_info.f12,
             name: base_info.f14,
             total: base_info.f20.map(|v| v as i64),
-            price: Some(base_info.f2.unwrap() as f64),
-            increase: Some(base_info.f3.unwrap() as f64),
+            price: Some(base_info.f2.expect("price解析失败") as f64),
+            increase: Some(base_info.f3.expect("increase解析失败") as f64),
             turnover: base_info.f8,
             into_date: base_info.f26,
             //日期格式2025-1-17
@@ -105,14 +100,15 @@ pub async fn get_sort_info() -> impl Responder {
 /// 获取板块涨跌信息
 #[get("/section")]
 pub async fn get_section(db: web::Data<DbService>) -> impl Responder {
-    let section = db.get_json_only().await.unwrap();
-    HttpResponse::Ok().json(ApiResponse::success(section.section))
+    let section = db.get_json_only().await.expect("获取板块涨跌信息失败");
+    let json: Value = serde_json::from_str::<Value>(&section.section.unwrap()).expect("json解析失败");
+    HttpResponse::Ok().json(ApiResponse::success(json))
 }
 
 /// 获取二级板块正负条形图数据
 #[get("/sectionBar")]
 pub async fn get_section_bar(db: web::Data<DbService>) -> impl Responder {
-    handle_db_result(db.get_section_bar().await).await
+    HttpResponse::Ok().json(ApiResponse::success("未开发完成"))
 }
 
 pub fn init_routes(config: &mut web::ServiceConfig) {

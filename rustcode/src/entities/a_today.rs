@@ -3,14 +3,26 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "a_data_json")]
+#[sea_orm(table_name = "a_today")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     #[sea_orm(column_type = "Text", nullable)]
-    pub json: Option<String>,
+    pub name: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
-    pub section: Option<String>,
+    pub code: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub total: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub price: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub increase: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub arr_value: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub turnover: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub into_date: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
     pub today: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]

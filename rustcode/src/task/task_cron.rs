@@ -7,7 +7,7 @@ use std::time::Instant;
 use tokio_cron_scheduler::{Job, JobScheduler};
 
 use crate::entities::prelude::*;
-use crate::entities::holiday::{self, Column};
+use crate::entities::a_holiday::{self, Column};
 
 #[derive(Clone)]
 pub struct TaskService {
@@ -77,13 +77,13 @@ impl TaskService {
     }
 
     async fn check_holiday(&self, date: &str) -> Result<Option<bool>, Box<dyn std::error::Error>> {
-        let holiday = Holiday::find()
+        let holiday = a_holiday::Entity::find()
             .filter(Column::Date.eq(date))
             .one(&*self.db)
             .await?;
 
         if let Some(record) = holiday {
-            return Ok(Some(record.holiday));
+            return Ok(Some(record.holiday.unwrap_or(0) == 1));
         }
 
         let url = format!("{}{}", self.holiday_url, date);
@@ -102,9 +102,9 @@ impl TaskService {
             }
         }
 
-        let holiday = holiday::ActiveModel {
+        let holiday = a_holiday::ActiveModel {
             date: Set(Some(date.to_string())),
-            holiday: Set(is_holiday),
+            holiday: Set(Some(is_holiday as i32)),
             name: Set(Some(holiday_name)),
             ..Default::default()
         };

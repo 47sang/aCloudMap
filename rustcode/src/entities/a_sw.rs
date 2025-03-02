@@ -3,18 +3,20 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "a_data_json")]
+#[sea_orm(table_name = "a_sw")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     #[sea_orm(column_type = "Text", nullable)]
-    pub json: Option<String>,
+    pub stock_code: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
-    pub section: Option<String>,
+    pub sw_code: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
-    pub today: Option<String>,
+    pub industry_name: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
-    pub creat_time: Option<String>,
+    pub industry_type: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub source: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

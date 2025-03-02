@@ -7,13 +7,13 @@ mod entities;
 
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
-use log::{error, info};
 use sea_orm::{Database, DatabaseConnection, ConnectionTrait};
 use std::env;
+use std::path::Path;
 use std::sync::Arc;
 
 use config::create_sql::create_sql;
-use controller::stock_handler;
+use controller::index_controller;
 use services::db_service::DbService;
 use task::task_cron::TaskService;
 
@@ -31,7 +31,7 @@ async fn main() -> std::io::Result<()> {
     // 数据库连接配置
     let database_url = env::var("DATABASE_URL").expect("没有配置数据库连接");
     // 将相对路径转换为绝对路径
-    let database_path = std::path::Path::new(&database_url);
+    let database_path = Path::new(&database_url);
     let absolute_path = if database_path.is_relative() {
         std::env::current_dir()?.join(database_path)
     } else {
@@ -74,7 +74,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Cors::permissive())
             .app_data(web::Data::new(service.clone()))
-            .service(web::scope("/info").configure(stock_handler::init_routes))
+            .service(web::scope("/info").configure(index_controller::init_routes))
     })
     .bind(format!("0.0.0.0:{}", env::var("PORT").unwrap()))?
     .run()
