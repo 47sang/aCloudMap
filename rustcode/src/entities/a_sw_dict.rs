@@ -5,11 +5,14 @@ use sea_orm::entity::prelude::*;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "a_sw_dict")]
 pub struct Model {
+    // 主键
     #[sea_orm(primary_key)]
     #[sea_orm(column_type = "Text", nullable)]
     pub code: String,
+    // 名称
     #[sea_orm(column_type = "Text", nullable)]
     pub name: Option<String>,
+    // 类型
     #[sea_orm(column_type = "Text", nullable)]
     pub r#type: Option<String>,
 }

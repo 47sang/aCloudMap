@@ -5,14 +5,19 @@ use sea_orm::entity::prelude::*;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "a_data_json")]
 pub struct Model {
+    // 主键 
     #[sea_orm(primary_key)]
     pub id: i32,
+    // 个股数据
     #[sea_orm(column_type = "Text", nullable)]
     pub json: Option<String>,
+    // 板块数据
     #[sea_orm(column_type = "Text", nullable)]
     pub section: Option<String>,
+    // 数据日期
     #[sea_orm(column_type = "Text", nullable)]
     pub today: Option<String>,
+    // 创建时间
     #[sea_orm(column_type = "Text", nullable)]
     pub creat_time: Option<String>,
 }

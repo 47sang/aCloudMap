@@ -5,16 +5,22 @@ use sea_orm::entity::prelude::*;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "a_sw")]
 pub struct Model {
+    // 主键
     #[sea_orm(primary_key)]
     pub id: i32,
+    // 股票代码
     #[sea_orm(column_type = "Text", nullable)]
     pub stock_code: Option<String>,
+    // 申万板块代码
     #[sea_orm(column_type = "Text", nullable)]
     pub sw_code: Option<String>,
+    // 板块名称
     #[sea_orm(column_type = "Text", nullable)]
     pub industry_name: Option<String>,
+    // 申万类型
     #[sea_orm(column_type = "Text", nullable)]
     pub industry_type: Option<String>,
+    // 来源
     #[sea_orm(column_type = "Text", nullable)]
     pub source: Option<String>,
 }

@@ -5,11 +5,15 @@ use sea_orm::entity::prelude::*;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "a_holiday")]
 pub struct Model {
+    // 主键
     #[sea_orm(primary_key)]
     pub id: i32,
+    // 是否为节假日
     pub holiday: Option<i32>,
+    // 节日名称
     #[sea_orm(column_type = "Text", nullable)]
     pub name: Option<String>,
+    // 日期
     #[sea_orm(column_type = "Text", nullable)]
     pub date: Option<String>,
 }

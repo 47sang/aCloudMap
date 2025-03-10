@@ -5,26 +5,37 @@ use sea_orm::entity::prelude::*;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "a_today")]
 pub struct Model {
+    // 主键
     #[sea_orm(primary_key)]
     pub id: i32,
+    // 股票名称
     #[sea_orm(column_type = "Text", nullable)]
     pub name: Option<String>,
+    // 股票代码
     #[sea_orm(column_type = "Text", nullable)]
     pub code: Option<String>,
+    // 总市值
     #[sea_orm(column_type = "Text", nullable)]
     pub total: Option<String>,
+    // 当前价
     #[sea_orm(column_type = "Text", nullable)]
     pub price: Option<String>,
+    // 涨跌幅%
     #[sea_orm(column_type = "Text", nullable)]
     pub increase: Option<String>,
+    // 数据数组
     #[sea_orm(column_type = "Text", nullable)]
     pub arr_value: Option<String>,
+    // 换手率
     #[sea_orm(column_type = "Text", nullable)]
     pub turnover: Option<String>,
+    // 上市日期
     #[sea_orm(column_type = "Text", nullable)]
     pub into_date: Option<String>,
+    // 数据日期
     #[sea_orm(column_type = "Text", nullable)]
     pub today: Option<String>,
+    // 创建时间
     #[sea_orm(column_type = "Text", nullable)]
     pub creat_time: Option<String>,
 }
