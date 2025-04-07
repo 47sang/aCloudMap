@@ -1,5 +1,6 @@
 use crate::models::{AToday, ApiResponse, BaseInfo};
 use crate::services::db_service::DbService;
+use crate::services::data_service::DataService;
 use actix_web::{get, web, HttpResponse, Responder};
 use reqwest::Client;
 use serde::Serialize;
@@ -21,8 +22,8 @@ async fn handle_db_result<T: Serialize, E: std::error::Error + std::fmt::Display
 
 /// 获取一二级分类整理后的所有股票信息
 #[get("/all")]
-pub async fn get_all_info(db: web::Data<DbService>) -> impl Responder {
-  let section = db.get_json_only().await.expect("获取今日数据失败");
+pub async fn get_all_info(db: web::Data<DataService>) -> impl Responder {
+  let section = db.get_all_info().await.expect("获取今日数据失败");
   let json: Value = serde_json::from_str::<Value>(&section.json.unwrap()).expect("json解析失败");
   HttpResponse::Ok().json(ApiResponse::success(json))
 }

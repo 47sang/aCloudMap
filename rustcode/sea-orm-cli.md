@@ -23,3 +23,8 @@ sea-orm-cli generate entity -o <OUTPUT_DIR> -u <DATABASE_URL>
 ```shell
 sea-orm-cli generate entity -o src/entities -u sqlite://./rustdb.db
 ```
+
+- 交叉编译
+```shell
+docker run --rm -v "${PWD}:/usr/src/myapp" -w /usr/src/myapp rust:latest cargo build --release --target x86_64-unknown-linux-gnu
+```
