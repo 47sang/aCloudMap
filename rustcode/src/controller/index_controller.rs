@@ -1,31 +1,26 @@
-use crate::models::{AToday, ApiResponse, BaseInfo};
-use crate::services::db_service::DbService;
+use crate::models::{app_error::AppError, AToday, ApiResponse, BaseInfo};
 use crate::services::data_service::DataService;
+use crate::services::db_service::DbService;
 use actix_web::{get, web, HttpResponse, Responder};
 use reqwest::Client;
 use serde::Serialize;
+use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
-use serde_json::Value;
-
-/// 辅助函数：将 Result 转换为 HTTP 响应
-async fn handle_db_result<T: Serialize, E: std::error::Error + std::fmt::Display>(
-    result: Result<T, E>,
-) -> impl Responder {
-    let response = match result {
-        Ok(data) => ApiResponse::success(data),
-        Err(e) => ApiResponse::fail(&e.to_string()),
-    };
-    HttpResponse::Ok().json(response)
-}
 
 
 /// 获取一二级分类整理后的所有股票信息
 #[get("/all")]
-pub async fn get_all_info(db: web::Data<DataService>) -> impl Responder {
-  let section = db.get_all_info().await.expect("获取今日数据失败");
-  let json: Value = serde_json::from_str::<Value>(&section.json.unwrap()).expect("json解析失败");
-  HttpResponse::Ok().json(ApiResponse::success(json))
+pub async fn get_all_info(db: web::Data<DataService>) -> Result<HttpResponse, AppError> {
+    let section = db
+        .get_all_info()
+        .await
+        .map_err(|e| AppError::DbError(e.to_string()))?;
+
+    let json: Value =
+        serde_json::from_str(&section).map_err(|e| AppError::JsonError(e.to_string()))?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success(json)))
 }
 
 /// 按照市值排序的股票信息
@@ -50,12 +45,13 @@ pub async fn get_sort_info() -> impl Responder {
         .query(&params)
         .send()
         .await;
-    let result = result.expect("获取数据请求失败").text()
+    let result = result
+        .expect("获取数据请求失败")
+        .text()
         .await
         .expect("东方财富接口获取数据失败")
         .replace("\"-\"", "0");
-    let json = serde_json::from_str::<Value>(&result)
-        .expect("json解析失败");
+    let json = serde_json::from_str::<Value>(&result).expect("json解析失败");
     let data = json.get("data").expect("data解析失败");
     let diff = data.get("diff").expect("diff解析失败");
     let diff_array = diff.as_array().expect("转换数组失败");
@@ -65,7 +61,6 @@ pub async fn get_sort_info() -> impl Responder {
     for (i, item) in diff_array.iter().enumerate() {
         let base_info = serde_json::from_value::<BaseInfo>(item.clone()).expect("baseInfo解析失败");
 
-        
         let mut a_today = AToday {
             id: i as i32 + 1,
             code: base_info.f12,
@@ -94,14 +89,14 @@ pub async fn get_sort_info() -> impl Responder {
     }
 
     HttpResponse::Ok().json(ApiResponse::success(a_today_list))
-    
 }
 
 /// 获取板块涨跌信息
 #[get("/section")]
 pub async fn get_section(db: web::Data<DbService>) -> impl Responder {
     let section = db.get_json_only().await.expect("获取板块涨跌信息失败");
-    let json: Value = serde_json::from_str::<Value>(&section.section.unwrap()).expect("json解析失败");
+    let json: Value =
+        serde_json::from_str::<Value>(&section.section.unwrap()).expect("json解析失败");
     HttpResponse::Ok().json(ApiResponse::success(json))
 }
 

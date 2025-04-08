@@ -5,6 +5,7 @@ mod data_bo;
 mod data_vo;
 mod market_data;
 mod response;
+pub mod app_error;
 
 pub use api_param::BaseInfo;
 pub use data_bo::{DataBO, ChildrenDTO, ChildrenDTO3,SectionBO};

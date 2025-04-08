@@ -1,20 +1,20 @@
+mod config;
 mod controller;
+mod entities;
 mod models;
 mod services;
 mod task;
-mod config;
-mod entities;
 
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
-use sea_orm::{Database, DatabaseConnection, ConnectionTrait};
+use sea_orm::{ConnectionTrait, Database, DatabaseConnection};
 use std::env;
 use std::path::Path;
 use std::sync::Arc;
 
 use config::create_sql::create_sql;
 use controller::index_controller;
-use services::db_service::DbService;
+use services::{data_service::DataService, db_service::DbService};
 use task::task_cron::TaskService;
 
 #[actix_web::main]
@@ -37,10 +37,10 @@ async fn main() -> std::io::Result<()> {
     } else {
         database_path.to_path_buf()
     };
-    
+
     // 构建 SQLite 连接 URL
     let database_url = format!("sqlite:{}?mode=rwc", absolute_path.display());
-    
+
     // 确保数据库目录存在
     if let Some(parent) = absolute_path.parent() {
         std::fs::create_dir_all(parent)?;
@@ -58,6 +58,7 @@ async fn main() -> std::io::Result<()> {
 
     let db = Arc::new(db);
     let service = DbService::new(db.clone());
+    let data_service = DataService::new(db.clone());
 
     // 获取节假日API URL
     // let holiday_url = env::var("HOLIDAY_URL").expect("HOLIDAY_URL must be set");
@@ -74,6 +75,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Cors::permissive())
             .app_data(web::Data::new(service.clone()))
+            .app_data(web::Data::new(data_service.clone()))
             .service(web::scope("/info").configure(index_controller::init_routes))
     })
     .bind(format!("0.0.0.0:{}", env::var("PORT").unwrap()))?
