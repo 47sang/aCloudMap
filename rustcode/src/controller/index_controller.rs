@@ -3,7 +3,6 @@ use crate::services::data_service::DataService;
 use crate::services::db_service::DbService;
 use actix_web::{get, web, HttpResponse, Responder};
 use reqwest::Client;
-use serde::Serialize;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::env;

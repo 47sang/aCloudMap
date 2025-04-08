@@ -1,17 +1,11 @@
 use actix_web::{HttpResponse, ResponseError};
-use serde::Serialize;
+use crate::models::response::ApiResponse;
 
 #[derive(Debug)]
 pub enum AppError {
     DbError(String),
     JsonError(String),
     RequestError(String),
-}
-
-#[derive(Serialize)]
-struct ErrorResponse {
-    code: i32,
-    msg: String,
 }
 
 impl std::fmt::Display for AppError {
@@ -32,10 +26,7 @@ impl ResponseError for AppError {
             AppError::RequestError(msg) => msg,
         };
 
-        HttpResponse::Ok().json(ErrorResponse {
-            code: -1,
-            msg: error_message.to_string(),
-        })
+        HttpResponse::Ok().json(ApiResponse::<()>::fail_with_code(-1, error_message))
     }
 }
 
