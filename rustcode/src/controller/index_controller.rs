@@ -10,99 +10,105 @@ use std::env;
 
 /// 获取一二级分类整理后的所有股票信息
 #[get("/all")]
-pub async fn get_all_info(db: web::Data<DataService>) -> Result<HttpResponse, AppError> {
-    let section = db
+pub async fn get_all_info(data_service: web::Data<DataService>) -> Result<HttpResponse, AppError> {
+    let result = data_service
         .get_all_info()
         .await
         .map_err(|e| AppError::DbError(e.to_string()))?;
 
     let json: Value =
-        serde_json::from_str(&section).map_err(|e| AppError::JsonError(e.to_string()))?;
+        serde_json::from_str(&result).map_err(|e| AppError::JsonError(e.to_string()))?;
 
     Ok(HttpResponse::Ok().json(ApiResponse::success(json)))
 }
 
 /// 按照市值排序的股票信息
 #[get("/sort")]
-pub async fn get_sort_info() -> impl Responder {
-    let params = HashMap::from([
-        ("pn", "1"),
-        ("pz", "200"),
-        ("po", "1"),
-        ("np", "1"),
-        ("ut", "bd1d9ddb04089700cf9c27f6f7426281"),
-        ("fltt", "2"),
-        ("invt", "2"),
-        ("fid", "f20"),
-        ("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"),
-        ("fields", "f2,f3,f8,f12,f14,f20,f26"),
-        ("_", "1623833739532"),
-    ]);
-
-    let result = Client::new()
-        .get(env::var("ALL_INFO").expect("未设置东方财富接口"))
-        .query(&params)
-        .send()
-        .await;
-    let result = result
-        .expect("获取数据请求失败")
-        .text()
+pub async fn get_sort_info(data_service: web::Data<DataService>) -> Result<HttpResponse, AppError> {
+    // 直接调用已有的 get_today_info 方法获取排序后的数据
+    let result = data_service
+        .get_today_info()
         .await
-        .expect("东方财富接口获取数据失败")
-        .replace("\"-\"", "0");
-    let json = serde_json::from_str::<Value>(&result).expect("json解析失败");
-    let data = json.get("data").expect("data解析失败");
-    let diff = data.get("diff").expect("diff解析失败");
-    let diff_array = diff.as_array().expect("转换数组失败");
+        .map_err(|e| AppError::DbError(e.to_string()))?;
 
-    let mut a_today_list: Vec<AToday> = vec![];
+    // 解析数据并按市值重新排序
+    let json: Value = serde_json::from_str(&result)
+        .map_err(|e| AppError::JsonError(e.to_string()))?;
 
-    for (i, item) in diff_array.iter().enumerate() {
-        let base_info = serde_json::from_value::<BaseInfo>(item.clone()).expect("baseInfo解析失败");
-
-        let mut a_today = AToday {
-            id: i as i32 + 1,
-            code: base_info.f12,
-            name: base_info.f14,
-            total: base_info.f20.map(|v| v as i64),
-            price: Some(base_info.f2.expect("price解析失败") as f64),
-            increase: Some(base_info.f3.expect("increase解析失败") as f64),
-            turnover: base_info.f8,
-            into_date: base_info.f26,
-            //日期格式2025-1-17
-            today: Some(chrono::Utc::now().format("%Y-%m-%d").to_string()),
-            creat_time: chrono::Utc::now().into(),
-            arr_value: None,
-            value: None,
-        };
-
-        let arr: Value = serde_json::json!([
-            a_today.total.unwrap_or(0),
-            a_today.price.unwrap_or(0.0),
-            a_today.increase.unwrap_or(0.0)
-        ]);
-
-        a_today.arr_value = Some(arr.to_string());
-        a_today.value = Some(arr.to_string());
-        a_today_list.push(a_today);
+    // 从所有分类中提取股票数据并按市值排序
+    let mut all_stocks = Vec::new();
+    if let Value::Array(categories) = json {
+        for category in categories {
+            if let Some(children) = category.get("children") {
+                if let Value::Array(sub_categories) = children {
+                    for sub_category in sub_categories {
+                        if let Some(stocks) = sub_category.get("children") {
+                            if let Value::Array(stock_list) = stocks {
+                                all_stocks.extend(stock_list.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    HttpResponse::Ok().json(ApiResponse::success(a_today_list))
+    // 按总市值排序
+    all_stocks.sort_by(|a, b| {
+        let a_total = a.get("total").and_then(|v| v.as_i64()).unwrap_or(0);
+        let b_total = b.get("total").and_then(|v| v.as_i64()).unwrap_or(0);
+        b_total.cmp(&a_total)
+    });
+
+    // 添加序号
+    for (i, stock) in all_stocks.iter_mut().enumerate() {
+        if let Some(obj) = stock.as_object_mut() {
+            obj.insert("id".to_string(), Value::Number((i + 1).into()));
+        }
+    }
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success(all_stocks)))
 }
 
 /// 获取板块涨跌信息
 #[get("/section")]
-pub async fn get_section(db: web::Data<DbService>) -> impl Responder {
-    let section = db.get_json_only().await.expect("获取板块涨跌信息失败");
-    let json: Value =
-        serde_json::from_str::<Value>(&section.section.unwrap()).expect("json解析失败");
-    HttpResponse::Ok().json(ApiResponse::success(json))
+pub async fn get_section(db: web::Data<DbService>) -> Result<HttpResponse, AppError> {
+    let section = db.get_json_only().await
+        .map_err(|e| AppError::DbError(e.to_string()))?;
+    
+    let json: Value = if let Some(section_data) = section.section {
+        serde_json::from_str(&section_data)
+            .map_err(|e| AppError::JsonError(e.to_string()))?
+    } else {
+        return Err(AppError::DbError("没有板块数据".to_string()));
+    };
+    
+    Ok(HttpResponse::Ok().json(ApiResponse::success(json)))
 }
 
 /// 获取二级板块正负条形图数据
 #[get("/sectionBar")]
-pub async fn get_section_bar(db: web::Data<DbService>) -> impl Responder {
-    HttpResponse::Ok().json(ApiResponse::success("未开发完成"))
+pub async fn get_section_bar(data_service: web::Data<DataService>) -> Result<HttpResponse, AppError> {
+    let section_bar_data = data_service
+        .get_section_bar()
+        .await
+        .map_err(|e| AppError::DbError(e.to_string()))?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success(section_bar_data)))
+}
+
+/// 获取今日股票信息（用于定时任务调用）
+#[get("/todayInfo")]
+pub async fn get_today_info(data_service: web::Data<DataService>) -> Result<HttpResponse, AppError> {
+    let result = data_service
+        .get_today_info()
+        .await
+        .map_err(|e| AppError::DbError(e.to_string()))?;
+
+    let json: Value =
+        serde_json::from_str(&result).map_err(|e| AppError::JsonError(e.to_string()))?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success(json)))
 }
 
 pub fn init_routes(config: &mut web::ServiceConfig) {
@@ -110,5 +116,6 @@ pub fn init_routes(config: &mut web::ServiceConfig) {
         .service(get_all_info)
         .service(get_sort_info)
         .service(get_section)
-        .service(get_section_bar);
+        .service(get_section_bar)
+        .service(get_today_info);
 }

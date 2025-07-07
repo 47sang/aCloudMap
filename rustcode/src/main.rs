@@ -61,24 +61,32 @@ async fn main() -> std::io::Result<()> {
     let data_service = DataService::new(db.clone());
 
     // 获取节假日API URL
-    // let holiday_url = env::var("HOLIDAY_URL").expect("HOLIDAY_URL must be set");
+    let holiday_url = env::var("HOLIDAY_URL").unwrap_or_else(|_| {
+        log::warn!("HOLIDAY_URL 未设置，使用默认值");
+        "https://api.example.com/holiday?date=".to_string()
+    });
 
     // 初始化并启动定时任务
-    // let task_service = TaskService::new(db.clone(), holiday_url);
-    // tokio::spawn(async move {
-    //     if let Err(e) = task_service.start_scheduler().await {
-    //         error!("Failed to start scheduler: {}", e);
-    //     }
-    // });
+    let task_service = TaskService::new(db.clone(), holiday_url);
+    let task_service_for_spawn = task_service.clone();
+    
+    tokio::spawn(async move {
+        if let Err(e) = task_service_for_spawn.start_scheduler().await {
+            log::error!("Failed to start scheduler: {}", e);
+        }
+    });
+
+    log::info!("服务器启动中...");
 
     HttpServer::new(move || {
         App::new()
             .wrap(Cors::permissive())
             .app_data(web::Data::new(service.clone()))
             .app_data(web::Data::new(data_service.clone()))
+            .app_data(web::Data::new(task_service.clone()))
             .service(web::scope("/info").configure(index_controller::init_routes))
     })
-    .bind(format!("0.0.0.0:{}", env::var("PORT").unwrap()))?
+    .bind(format!("0.0.0.0:{}", env::var("PORT").unwrap_or_else(|_| "8080".to_string())))?
     .run()
     .await
 }

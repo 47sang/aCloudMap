@@ -4,7 +4,7 @@ use serde_json::Value;
 use sea_orm::FromQueryResult;
 
 /// 今日数据
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AToday {
     /// 主键
     pub id: i32,
@@ -13,23 +13,23 @@ pub struct AToday {
     /// 股票代码
     pub code: Option<String>,
     /// 总市值
-    pub total: Option<i64>,
+    pub total: Option<String>,
     /// 当前价
-    pub price: Option<f64>,
+    pub price: Option<String>,
     /// 涨跌幅%
-    pub increase: Option<f64>,
+    pub increase: Option<String>,
     /// 数据数组str
     pub arr_value: Option<String>,
     /// 数据数组
     pub value: Option<String>,
     /// 换手率
-    pub turnover: Option<f64>,
+    pub turnover: Option<String>,
     /// 上市日期
     pub into_date: Option<String>,
     /// 数据日期
     pub today: Option<String>,
     /// 创建时间
-    pub creat_time: Option<DateTime<Utc>>,
+    pub creat_time: Option<String>,
 }
 
 /// 每日数据
