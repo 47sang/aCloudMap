@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication
-@MapperScan("com.galigeigei.acloudmap.mapper")
+@MapperScan("com.galigeigei.acloudmap.infrastructure.mapper")
 public class AcloudmapApplication {
 
     public static void main(String[] args) {
