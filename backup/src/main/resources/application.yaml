@@ -1,0 +1,19 @@
+server:
+  port: 1808
+  servlet:
+    context-path: /aCloudMap
+
+spring:
+  profiles:
+#    active: dev
+    active: prod
+  application:
+    name: aCloudMap
+
+# 第三方接口配置
+parameters:
+#  今日A股所有涨跌幅信息
+  allInfo: https://82.push2.eastmoney.com/api/qt/clist/get
+#  查询今日是否是节假日
+  holidayUrl: https://timor.tech/api/holiday/info/
+

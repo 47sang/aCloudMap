@@ -1,0 +1,119 @@
+<!--
+	此示例下载自 https://echarts.apache.org/examples/zh/editor.html?c=bar-negative&code=PYBwLglsB2AEC8sDeAoWszGAG0iAXMmuhgE4QDmFApqYQOQCGAHhAM70A0x6L7ACsAjQwtQqhIkwATxDUGbABaMAJsADu9HrAC-xHd3TZqNaCvHaVjMI0IBtev1LAAZhDBdY9AKLM50NmoOTi8ASWgAY2AAW2p6AF19Q1gKcnMiSWMXMAYAZgBSLm1yCkUcrwAWQuT0ACNgMExovOrtKJFGYQAZRlrqbEIwUgBXaiTiZgBBVjZ7bQlJDFl5LwA3RmxRrUk9dHjk6Wn2OckFyRk5BgjrE2BSaSLF2D42ABUICIBrCyf0JQ1CC4NoFtOgDKDYFYbPZ6IA3lMAMhGeeiAKWVAD_agGV5JEAdWoKiRr0UwyRADFyEiAMrWCnDaAJbS7WD7YiBchBE4kM4kaCMWIMQDK-oBZJUAQHqAHgVHosLit6LVGKRxZlev0fr9_upBiNqDVFiBgGx3FBoAxhHqVHEIeCntRoiBlHrZhlfi5gBFhvb6CyIEFtosLYsobZYHYAKwARgADCEQwB2COwABMFVjCYqITjYaTadT4cSOy1nPQ3N5XkAFGaAU9NRfKpMsGDK5Vq_jYvgxXg0NpWjIqBg6nqr1aNzfXYFabYw7cqnk6XW6PV6BxD_fYg0HY7kw3GQrkKiGN1GU7BcgBOWMVZchCppnMkX3ofOwQtSwAVtoAZ2MAuRntpaXLy199sRvfLwtjY2DvtgnbjosvZkKMg7oDqeqQDADBZB4c6WtatrHN2iyTq6Ci0J6HCoX61gBnYAC0p6wGRIa5OuVHhtu9GbiE1FHixcarux2b0sQiQ6AA3EAA
+	⚠ 请注意，该图表不是 Apache ECharts 官方示例，而是由用户代码生成的。请注意鉴别其内容。
+-->
+<!DOCTYPE html>
+<html lang="zh_CN" style="height: 100%">
+
+<head>
+    <title>二级板块正负条形图</title>
+    <meta charset="utf-8">
+</head>
+<body style="height: 100%; margin: 0">
+<div id="container" style="height: 12000px"></div>
+<script type="text/javascript" src="https://registry.npmmirror.com/jquery/3.7.1/files/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/echarts.min.js"></script>
+
+<script type="text/javascript">
+    var dom = document.getElementById('container');
+    var myChart = echarts.init(dom, null, {
+        renderer: 'canvas',
+        useDirtyRect: false
+    });
+    var app = {};
+    var API_PATH = './info/sectionBar';
+
+    var option;
+
+    myChart.showLoading();
+    $.get(API_PATH, function (jsonData) {
+
+        myChart.hideLoading();
+
+        const json = jsonData.data;
+
+        console.log('接口返回数据：', json);
+
+        myChart.setOption(
+                (option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['Profit', 'Expenses', 'Income']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    data: json.categoryName
+                }
+            ],
+            series: [
+                {
+                    name: '当前市值',
+                    type: 'bar',
+                    label: {
+                        show: true,
+                        position: 'inside'
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: json.nowNum
+                },
+                {
+                    name: '昨日市值',
+                    type: 'bar',
+                    stack: 'Total',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: json.yesterdayNum
+                },
+                {
+                    name: '涨跌额',
+                    type: 'bar',
+                    stack: 'Total',
+                    label: {
+                        show: true,
+                        position: 'left'
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: json.changeAmount
+                }
+            ]
+        })
+            );
+
+    })
+
+    if (option && typeof option === 'object') {
+        myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+</script>
+</body>
+</html>
