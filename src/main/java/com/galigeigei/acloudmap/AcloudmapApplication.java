@@ -3,9 +3,11 @@ package com.galigeigei.acloudmap;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
+@EnableAsync
 @SpringBootApplication
 @MapperScan("com.galigeigei.acloudmap.infrastructure.mapper")
 public class AcloudmapApplication {
@@ -16,6 +18,7 @@ public class AcloudmapApplication {
         System.out.println("市值大小排序: http://localhost:1808/aCloudMap/sort");
         System.out.println("二级板块云图: http://localhost:1808/aCloudMap/section");
         System.out.println("二级板块条形图: http://localhost:1808/aCloudMap/sectionBar");
+        System.out.println("虚拟线程已启用!");
     }
 
 
