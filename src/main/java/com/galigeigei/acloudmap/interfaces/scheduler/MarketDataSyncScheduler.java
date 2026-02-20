@@ -56,7 +56,6 @@ public class MarketDataSyncScheduler {
         } else {
             // 查询节假日API
             AHolidayEntity holidayEntity = holidayApiClient.fetchHolidayInfo(today);
-            holidayEntity.setCreatTime(new Date());
             aHolidayMapper.insert(holidayEntity);
             
             if (holidayEntity.getHoliday()) {
