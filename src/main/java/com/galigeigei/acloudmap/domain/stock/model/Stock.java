@@ -170,6 +170,24 @@ public class Stock implements Serializable {
     }
     
     /**
+     * 获取所属板块代码
+     *
+     * @return 一级板块代码
+     */
+    public SectionCode getSectionCode() {
+        return sectionCode;
+    }
+    
+    /**
+     * 获取所属二级板块代码
+     *
+     * @return 二级板块代码
+     */
+    public SectionCode getSecondarySectionCode() {
+        return secondarySectionCode;
+    }
+    
+    /**
      * 判断是否属于指定板块
      *
      * @param sectionCode 板块代码

@@ -181,7 +181,7 @@ public class Section implements Serializable {
     public List<Stock> getStocksSortedByMarketValue() {
         return stocks.stream()
                 .sorted(Comparator.comparing(Stock::getMarketValue, Comparator.nullsLast(Comparator.reverseOrder())))
-                .toList();
+                .collect(java.util.stream.Collectors.toList());
     }
     
     /**
@@ -203,6 +203,15 @@ public class Section implements Serializable {
      */
     public void setId(Integer id) {
         this.id = id;
+    }
+    
+    /**
+     * 获取父板块代码
+     *
+     * @return 父板块代码（二级板块使用）
+     */
+    public SectionCode getParentCode() {
+        return parentCode;
     }
     
     /**
